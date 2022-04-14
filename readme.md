@@ -1,7 +1,7 @@
 <!-- Uncomment the line below before converting this file to HTML -->
-<script src="https://kit.fontawesome.com/81ab11011e.js" crossorigin="anonymous"></script>
+<!-- <script src="https://kit.fontawesome.com/81ab11011e.js" crossorigin="anonymous"></script> -->
 <!-- Comment the line below before converting this file to HTML-->
-<!-- <a href="https://developers.itmplatform.com/extension-docs/" target> HTML version of this document.</a> -->
+<a href="https://developers.itmplatform.com/extension-docs/" target> HTML version of this document.</a>
 
 # Overview
 Extensions add a specific feature to ITM Platform. They can be used to extend functionality or as a connector between ITM Platform and a third-party system.
