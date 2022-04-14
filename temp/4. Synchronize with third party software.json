@@ -1,0 +1,223 @@
+{
+	"name": "jira3-itmtest",
+	"svgString": "<svg xmlns='http://www.w3.org/2000/svg' width='64' x='0px' y='0px' viewBox='0 0 73.3 75.8' style='enable-background:new 0 0 73.3 75.8;' xml:space='preserve'> <style type='text/css'> .st0{fill:#2684FF;} .st1{fill:url(#SVGID_1_);} .st2{fill:url(#SVGID_2_);} </style> <title>Jira Software-blue</title> <g> <g id='Blue'> <path class='st0' d='M72.4,35.8L39.8,3.2L36.6,0l0,0L12.1,24.5l0,0L0.9,35.8c-1.2,1.2-1.2,3.1,0,4.2l22.4,22.4l13.3,13.3 l24.5-24.5l0.4-0.4L72.4,40C73.6,38.8,73.6,36.9,72.4,35.8z M36.6,49.1L25.4,37.9l11.2-11.2l11.2,11.2L36.6,49.1z'/> <linearGradient id='SVGID_1_' gradientUnits='userSpaceOnUse' x1='34.6324' y1='62.655' x2='18.9924' y2='47.015' gradientTransform='matrix(1 0 0 -1 0 78)'> <stop offset='0.18' style='stop-color:#0052CC'/> <stop offset='1' style='stop-color:#2684FF'/> </linearGradient> <path class='st1' d='M36.6,26.7c-7.3-7.3-7.4-19.2-0.1-26.6L12,24.6l13.3,13.3L36.6,26.7z'/> <linearGradient id='SVGID_2_' gradientUnits='userSpaceOnUse' x1='38.7774' y1='17.72' x2='54.3874' y2='33.33' gradientTransform='matrix(1 0 0 -1 0 78)'> <stop offset='0.18' style='stop-color:#0052CC'/> <stop offset='1' style='stop-color:#2684FF'/> </linearGradient> <path class='st2' d='M47.9,37.8L36.6,49.1c7.4,7.4,7.4,19.3,0,26.7c0,0,0,0,0,0l0,0l24.6-24.6L47.9,37.8z'/> </g> </g> </svg>",
+	"details": {
+		"title": {
+			"en": "Jira (v3) to ITM Platform - Test",
+			"es": "Jira (v3) hacia ITM Platform",
+			"pt": "Jira (v3) para ITM Platform"
+		},
+		"version": "0.8",
+		"shortDescription": {
+			"en": "Synchronizes Jira API v3 with ITM Platform",
+			"es": "Sincroniza Jira (API v3) hacia ITM Platform",
+			"pt": "Sincroniza Jira (API v3) com ITM Platform"
+		},
+		"longDescription": {
+			"en": "It imports projects, issues and time entries from Jira Software into ITM Platform",
+			"es": "Importa proyectos, issues y registros de tiempo desde Jira Software hacia ITM Platform",
+			"pt": "Importa projetos, issues e registro de tempo do Jira Software para a ITM Platform"
+		},
+		"updated": "2021-05-19",
+		"developer": "ITM Platform"
+	},
+	"features": [
+		{
+			"trigger": "scheduler",
+			"description": "Getting data for the Project/Tasks from Jira(API version 3).",
+			"async": true,
+			"actions": [
+				{
+					"action": "restcall",
+					"url": "http://localhost/ITM.API/delete502/login/{{ config.apikey }}",
+					"method": "POST",
+					"description": "Login with apikey",
+					"output": "logininfo",
+					"payload": "",
+					"dataType": "application/json"
+				},
+				{
+					"action": "restcall",
+					"url": "{{ config.url }}/rest/api/3/project/10001",
+					"method": "GET",
+					"description": "Get single jira project.",
+					"payload": "",
+					"output": "jiraproject",
+					"dataType": "application/json",
+					"authentication": "basic",
+					"username": "{{ config.user }}",
+					"password": "{{ config.pass }}"
+				},
+				{
+					"action": "restcall",
+					"url": "http://localhost/ITM.API/v2/delete502/Projects/Search",
+					"method": "POST",
+					"description": "Get ITM project that are synchronized with JIRA is exist.",
+					"payload": "{\"Columns\": {\"$in\":[\"Id\",\"Name\",\"JiraId\",\"Type.Id\",\"MethodTypeId\"]},\"filter\": { \"JiraId\" : {{ jiraproject.id }} } }",
+					"output": "itmproject",
+					"dataType": "application/json",
+					"token": "{{ logininfo.Token }}"
+				},
+				{
+					"action": "restcall",
+					"url": "http://localhost/ITM.API/v2/delete502/Projects/{{ itmproject.list.0.Id }}?UserId=-99",
+					"condition": "Convert.ToInt32(itmproject.total) > 0",
+					"method": "PATCH",
+					"description": "Update ITM project with JIRA details.",
+					"payload": "{\"Name\": \"TestProject\",\"Description\": \"Test Description\",\"InternalCode\": \"TND\",\"JiraURL\": \"{{ config.url }}\" }",
+					"output": "updateditmProject",
+					"dataType": "application/json",
+					"token": "{{ logininfo.Token }}"
+				},
+				{
+					"action": "restcall",
+					"url": "http://localhost/ITM.API/v2/delete502/Projects?UserId=-99",
+					"condition": "Convert.ToBoolean(config.newprojectallowed) == true && Convert.ToInt32(itmproject.total) == 0",
+					"method": "POST",
+					"description": "Insert ITM project with JIRA details.",
+					"payload": "{\"Name\": \"TestProject\",\"Description\": \"Test Description\",\"InternalCode\": \"TND\",\"JiraURL\": \"{{ config.url }}\",\"SynchronizationSource\": \"Jira\",\"JiraId\": jiraproject.id }",
+					"output": "updateditmProject",
+					"dataType": "application/json",
+					"token": "{{ logininfo.Token }}"
+				},
+				{
+					"action": "restcall",
+					"url": "{{ config.url }}/rest/api/3/issue/10164",
+					"method": "GET",
+					"description": "Get single jira issue.",
+					"payload": "",
+					"output": "jiraissue",
+					"dataType": "application/json",
+					"authentication": "basic",
+					"username": "{{ config.user }}",
+					"password": "{{ config.pass }}"
+				},
+				{
+					"action": "restcall",
+					"url": "http://localhost/ITM.API/v2/delete502/Projects/{{ itmproject.list.0.Id }}/Tasks/Search",
+					"method": "POST",
+					"description": "Get ITM Task that are synchronized with JIRA is exist.",
+					"payload": "{\"Columns\": {\"$in\":[\"Id\",\"Name\",\"JiraId\"]},\"filter\": { \"JiraId\" : {{ jiraissue.id }} } }",
+					"output": "itmtask",
+					"dataType": "application/json",
+					"token": "{{ logininfo.Token }}"
+				},
+				{
+					"action": "restcall",
+					"url": "http://localhost/ITM.API/v2/delete502/Projects/{{ itmproject.list.0.Id }}/Tasks/{{ itmtask.list.0.Id }}?UserId=-99&LanguageId=@@LanguageId@@",
+					"condition": "Convert.ToInt32(itmtask.total) > 0",
+					"method": "PATCH",
+					"description": "Update ITM Task with JIRA details.",
+					"payload": "{\"Name\": \"{{ DoubleQuotesReplace issuesummary }}\",\"Details\": \"{{ issuedescription }}\",\"JiraURL\": \"{{ config.url }}\",\"SynchronizationSource\": \"Jira\",\"StartDate\": \"{{ date singlejiraissue.fields.created 'yyyy-MM-dd'}}\",\"EndDate\": {{#ifEquals singlejiraissue.fields.duedate '' }}\"{{DateTime.Now \"yyyy-MM-dd\"}}\"{{else}}\"{{ date singlejiraissue.fields.duedate 'yyyy-MM-dd'}}\"{{/ifEquals}},\"TypeName\": \"{{ map config.mapping.issuetype.external singlejiraissue.fields.issuetype.id }}\" ,\"PriorityName\": \"{{ map config.mapping.issuepriority.external singlejiraissue.fields.priority.id }}\"{{#ifEquals itmproject.list.0.MethodTypeId '2' }},\"KanbanId\":{{ kanbantaskstatus.KanbanId }}{{else}},\"StatusName\":\"{{ map config.mapping.issuestatus.external singlejiraissue.fields.status.id }}\"{{/ifEquals}} }",
+					"output": "updateditmtask",
+					"dataType": "application/json",
+					"token": "{{ logininfo.Token }}"
+				},
+				{
+					"action": "restcall",
+					"url": "http://localhost/ITM.API/v2/delete502/Projects/{{ itmproject.list.0.Id }}/Tasks?UserId=-99&LanguageId=@@LanguageId@@",
+					"condition": "Convert.ToBoolean(config.newissueallowed) == true && Convert.ToInt32(itmtask.total) == 0",
+					"method": "POST",
+					"description": "Insert ITM Task with JIRA details.",
+					"payload": "{\"Name\": \"{{ DoubleQuotesReplace issuesummary }}\",\"Details\": \"{{ issuedescription }}\",\"JiraURL\": \"{{ config.url }}\",\"SynchronizationSource\": \"Jira\",\"JiraId\": \"{{ singlejiraissue.id }}\",\"StartDate\": \"{{ date singlejiraissue.fields.created 'yyyy-MM-dd'}}\", \"EndDate\": {{#ifEquals singlejiraissue.fields.duedate '' }}\"{{DateTime.Now \"yyyy-MM-dd\"}}\"{{else}}\"{{ date singlejiraissue.fields.duedate 'yyyy-MM-dd' }}\"{{/ifEquals}},\"TypeName\":\"{{ map config.mapping.issuetype.external singlejiraissue.fields.issuetype.id }}\",\"PriorityName\": \"{{ map config.mapping.issuepriority.external singlejiraissue.fields.priority.id }}\"{{#ifEquals itmproject.list.0.MethodTypeId '2' }},\"KanbanId\":{{ kanbantaskstatus.KanbanId }}{{else}},\"StatusName\":\"{{ map config.mapping.issuestatus.external singlejiraissue.fields.status.id }}\"{{/ifEquals}} }",
+					"output": "updateditmtask",
+					"dataType": "application/json",
+					"token": "{{ logininfo.Token }}"
+				}
+			]
+		}
+	],
+	"config": [
+		{
+			"name": "isactive",
+			"label": {
+				"en": "Activate connector",
+				"es": "Activar conector",
+				"pt": "Ativar o conector"
+			},
+			"tooltip": {
+				"en": "When selected, the connector will be active and will start synchronizing data",
+				"es": "Cuando esté seleccionado, el conector estará activo y comenzará a sincronizar datos",
+				"pt": "Quando selecionado, o conector estará ativo e começará a sincronizar dados"
+			},
+			"type": "checkbox",
+			"required": false
+		},
+		{
+			"name": "url",
+			"label": {
+				"en": "Jira URL",
+				"es": "URL de Jira",
+				"pt": "Jira URL"
+			},
+			"tooltip": {
+				"en": "URL of the JIRA account",
+				"es": "URL de la cuenta de JIRA",
+				"pt": "URL da conta JIRA"
+			},
+			"type": "string",
+			"required": true
+		},
+		{
+			"name": "user",
+			"label": {
+				"en": "Username",
+				"es": "Nombre de usuario",
+				"pt": "Nome de usuário"
+			},
+			"tooltip": {
+				"en": "Username of the JIRA account",
+				"es": "Nombre de usuario de la cuenta de JIRA",
+				"pt": "Nome de usuário da conta de JIRA"
+			},
+			"type": "string",
+			"required": true
+		},
+		{
+			"name": "pass",
+			"label": {
+				"en": "Password/API Token",
+				"es": "Contraseña / API Token",
+				"pt": "Senha / API Token"
+			},
+			"tooltip": {
+				"en": "Password of the JIRA account",
+				"es": "Contraseña de la cuenta de JIRA",
+				"pt": "Senha da conta de JIRA"
+			},
+			"type": "password",
+			"required": true
+		},
+		{
+			"name": "synchronizationfrequency",
+			"label": {
+				"en": "Synchronization frequency (minutes)",
+				"es": "Frecuencia sincronización (minutos)",
+				"pt": "Frequência de sincronização (em minutos)"
+			},
+			"tooltip": {
+				"en": "Frequency you wish to establish for the synchronization of the data from you JIRA account",
+				"es": "Frecuencia con la que prefieres establecer la sincronización de los datos de tu cuenta de JIRA",
+				"pt": "Frequência com que prefere estabelecer a sincronização de dados de sua conta JIRA"
+			},
+			"type": "string",
+			"required": true
+		},
+		{
+			"name": "apikey",
+			"label": {
+				"en": "API Key",
+				"es": "API Key",
+				"pt": "API Key"
+			},
+			"tooltip": {
+				"en": "API Key",
+				"es": "API Key",
+				"pt": "API Key"
+			},
+			"type": "string",
+			"required": true
+		}
+	],
+	"mapping": []
+}

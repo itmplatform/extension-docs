@@ -1,0 +1,133 @@
+{
+    "name": "e31-overdue-task-email",
+    "svgString": "<svg xmlns='http://www.w3.org/2000/svg' fill='#495d73' viewBox='0 0 640 512'><path d='M640 256c0 35.35-21.49 64-48 64c-32.43 0-31.72-32-55.64-32C522.9 288 512 298.9 512 312.4V416c0 17.67-14.33 32-32 32h-103.6C362.9 448 352 437.1 352 423.6C352 399.1 384 400.4 384 368c0-26.51-28.65-48-64-48s-64 21.49-64 48c0 32.43 32 31.72 32 55.64C288 437.1 277.1 448 263.6 448H160c-17.67 0-32-14.33-32-32V312.4C128 298.9 117.1 288 103.6 288C79.95 288 80.4 320 48 320c-26.51 0-47.1-28.65-47.1-64S21.49 191.1 48 191.1c32.43 0 31.72 32 55.64 32C117.1 223.1 128 213.1 128 199.6V95.1C128 78.33 142.3 63.1 160 63.1l103.6 0C277.1 63.1 288 74.9 288 88.36C288 112 256 111.6 256 143.1C256 170.5 284.7 192 320 192s64-21.49 64-48c0-32.43-32-31.72-32-55.64c0-13.45 10.91-24.36 24.36-24.36L480 63.1c17.67 0 32 14.33 32 32v103.6c0 13.45 10.91 24.36 24.36 24.36c23.69 0 23.24-32 55.64-32C618.5 191.1 640 220.7 640 256z'/></svg>",
+    "details": {
+        "title": {
+            "en": "E3. Overdue task email",
+            "es": "E3. Alerta de tarea vencida",
+            "pt": "E3. Relatório de tarefa atrasada"
+        },
+        "version": "0.0.1",
+        "shortDescription": {
+            "en": "Example 3. Sends an email per each overdue task of a project.",
+            "es": "Ejemplo 3. Envía un correo electrónico por cada tarea atrasada de un proyecto.",
+            "pt": "Exemplo 3. Envia um e-mail por cada tarefa atrasada de um projeto."
+        }
+    },
+    "features": [
+        {
+            "trigger": "scheduler",
+            "async": true,
+            "actions": [
+                {
+                    "action": "restcall",
+                    "url": "@@ITMAPI@@/@@AccountName@@/login/{{ config.apikey }}",
+                    "method": "POST",
+                    "description": "Login with apikey",
+                    "output": "logininfo",
+                    "payload": "",
+                    "dataType": "application/json"
+                },
+                {
+                    "action": "restcall",
+                    "url": "@@ITMAPI@@/v2/@@AccountName@@/Projects/{{ config.projectId }}",
+                    "method": "POST",
+                    "description": "Get project detail",
+                    "payload": "{\"Columns\": {\"$in\": [\"Id\",\"Name\",\"Jiraid\",\"Team\"] } }",
+                    "output": "project",
+                    "dataType": "application/json",
+                    "token": "{{ logininfo.Token }}"
+                },
+                {
+                    "action": "restcall",
+                    "url": "@@ITMAPI@@/v2/@@AccountName@@/Projects/{{ config.projectId }}/Tasks/search",
+                    "method": "POST",
+                    "description": "Get all tasks from project",
+                    "payload": "{\"Columns\": { \"$in\": [ \"Id\", \"ProjectId\", \"Name\", \"EndDate\", \"Team.Managers\" ] }, \"filter\": { \"EndDate\": { \"$lte\": \"{{ DateTime.Now \"yyyy-MM-dd\" }}\" } } }",
+                    "output": "tasks",
+                    "dataType": "application/json",
+                    "token": "{{ logininfo.Token }}"
+                },
+                {
+                    "action": "loop",
+                    "loop": {
+                        "var": "tasks.list",
+                        "output": "singletask",
+                        "condition": "Convert.ToString(project.Team.Managers).length > 0 && singletask.EndDate != null"
+                    },
+                    "actions": [
+                        {
+                            "action": "email",
+                            "to": "{{ project.Team.Managers.0.EmailAddress }}",
+                            "subject": "Test Scheduler Mail",
+                            "body": "<html>{{ singletask.Name }} is due on {{ date singletask.EndDate \"MM-dd-yyyy\" }}.</html>"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "config": [
+        {
+            "name": "isactive",
+            "label": {
+                "en": "Activate plugin",
+                "es": "Activar extensión",
+                "pt": "Ativar o plugin"
+            },
+            "tooltip": {
+                "en": "You can find the id at the end of the project's url. https://app.itmplatform.com/<CompanyName>/UserPages/ProjectGeneral.aspx?pid=60746",
+                "es": "Puede encontrar el identificador al final de la URL del proyecto. https://app.itmplatform.com/<CompanyName>/UserPages/ProjectGeneral.aspx?pid=60746",
+                "pt": "Você pode encontrar o id no final da url do projeto. https://app.itmplatform.com/<CompanyName>/UserPages/ProjectGeneral.aspx?pid=60746"
+            },
+            "type": "checkbox",
+            "required": false
+        },
+        {
+            "name": "synchronizationfrequency",
+            "label": {
+                "en": "Synchronization frequency (minutes)",
+                "es": "Frecuencia sincronización (minutos)",
+                "pt": "Frequência de sincronização (em minutos)"
+            },
+            "tooltip": {
+                "en": "Frequency you wish to establish for the synchronization of the data from you JIRA account",
+                "es": "Frecuencia con la que prefieres establecer la sincronización de los datos de tu cuenta de JIRA",
+                "pt": "Frequência com que prefere estabelecer a sincronização de dados de sua conta JIRA"
+            },
+            "type": "string",
+            "required": true
+        },
+        {
+            "name": "projectId",
+            "label": {
+                "en": "Project Id",
+                "es": "Id de proyecto",
+                "pt": "Id do projeto"
+            },
+            "tooltip": {
+                "en": "You can find the id at the end of the project's url. https://app.itmplatform.com/<CompanyName>/UserPages/ProjectGeneral.aspx?pid=60746",
+                "es": "Puede encontrar el identificador al final de la URL del proyecto. https://app.itmplatform.com/<CompanyName>/UserPages/ProjectGeneral.aspx?pid=60746",
+                "pt": "Você pode encontrar o id no final da url do projeto. https://app.itmplatform.com/<CompanyName>/UserPages/ProjectGeneral.aspx?pid=60746"
+            },
+            "type": "string",
+            "required": true
+        },
+        {
+            "name": "apikey",
+            "label": {
+                "en": "API Key",
+                "es": "API Key",
+                "pt": "API Key"
+            },
+            "tooltip": {
+                "en": "ITM Platform API Key",
+                "es": "API Key",
+                "pt": "API Key"
+            },
+            "type": "string",
+            "required": true
+        }
+    ],
+    "updated": "25-03-2022"
+}

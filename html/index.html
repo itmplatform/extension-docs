@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>ITM Platform's Plugin Script Documentation</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="style.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">ITM Platform's Plugin Script Documentation</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#overview">Overview</a>
+<ul>
+<li><a href="#basic-concepts">Basic concepts</a></li>
+</ul></li>
+<li><a href="#extension-script">Extension script</a>
+<ul>
+<li><a href="#examples">Examples</a></li>
+<li><a href="#extension-general-definition">Extension General Definition</a></li>
+<li><a href="#features">Features</a>
+<ul>
+<li><a href="#checkpoints-1">Checkpoints</a></li>
+</ul></li>
+<li><a href="#actions">Actions</a>
+<ul>
+<li><a href="#action-types">Action Types</a></li>
+<li><a href="#action-conditionals">Action conditionals</a></li>
+</ul></li>
+<li><a href="#extension-configuration">Extension Configuration</a>
+<ul>
+<li><a href="#hardcoded-configuration-options">Hardcoded configuration options</a></li>
+</ul></li>
+<li><a href="#field-mapping">Field Mapping</a></li>
+</ul></li>
+<li><a href="#event-reference">Event Reference</a>
+<ul>
+<li><a href="#event-bubbling-up">Event bubbling up</a></li>
+</ul></li>
+<li><a href="#template-syntax">Template Syntax</a>
+<ul>
+<li><a href="#additional-expressions">Additional expressions</a>
+<ul>
+<li><a href="#data-type-converters">Data type converters</a></li>
+<li><a href="#value-replacements">Value replacements</a></li>
+<li><a href="#conditionals">Conditionals</a></li>
+</ul></li>
+<li><a href="#accessing-array-of-items">Accessing array of items</a></li>
+<li><a href="#type-modifiers">Type modifiers</a></li>
+</ul></li>
+<li><a href="#script-variables">Script Variables</a>
+<ul>
+<li><a href="#url">URL</a></li>
+</ul></li>
+<li><a href="#debugging">Debugging</a></li>
+<li><a href="#deploying-an-extension">Deploying an Extension</a></li>
+<li><a href="#multi-language">Multi-language</a></li>
+<li><a href="#terminology">Terminology</a></li>
+<li><a href="#examples-1">Examples</a>
+<ul>
+<li><a href="#obtaining-the-itm-platform-authentication-token">Obtaining the ITM Platform authentication token</a></li>
+</ul></li>
+</ul>
+</nav>
+<!-- Uncomment the line below before converting this file to HTML -->
+
+<script src="https://kit.fontawesome.com/81ab11011e.js" crossorigin="anonymous"></script>
+
+<!-- Comment the line below before converting this file to HTML-->
+
+<!-- <a href="https://developers.itmplatform.com/extension-docs/" target> HTML version of this document.</a> -->
+
+<h1 id="overview">Overview</h1>
+<p>Extensions add a specific feature to ITM Platform. They can be used to extend functionality or as a connector between ITM Platform and a third-party system.</p>
+<p>You can create your own custom extensions. This guide will help you get started and serve you as a reference when you become an expert.</p>
+<p>Each section of this guide is organized into three blocks: <i class="far fa-code" title="Learn by example"></i> <strong>Learn by example</strong>, <i class="fad fa-book-open" title="Guide"></i> <strong>Guide</strong>, and <i class="fad fa-brackets" title="Reference"></i> <strong>Reference</strong>.</p>
+<p>The <a href="#terminology">terminology</a> section will help you with the most commonly used terms.</p>
+<h2 id="basic-concepts">Basic concepts</h2>
+<ul>
+<li>You can access the extension panel in ITM Platform on the CONFIGURATION <i class="fa-solid fa-caret-right"></i> CUSTOMIZATION menu.</li>
+<li>You need a Full Access license to operate on existing global extensions and edit or create existing ones.</li>
+<li>You can create and edit your own extensions in the "code editor" section, which will give you access to the extension script. Notice that you can't edit global extensions.</li>
+<li>A extension script is a JSON file that follows a structure of instructions that will perform the functionality you need.</li>
+<li>A extension can be triggered based on time (scheduler) or specific ITM Platform events. For example, every day or when a purchase is updated.</li>
+</ul>
+<!-- every day at 8 am: Verify we explain how to use the scheduler, I'm not clear on this -->
+
+<ul>
+<li>Once triggered, the extension will initiate actions that can be chained to one another, forming a sequence of actions called features.</li>
+<li>Once a extension is ready, you can activate it.</li>
+</ul>
+<h1 id="extension-script">Extension script</h1>
+<p>A extension script is defined in a single JSON file, following this structure:</p>
+<ol type="1">
+<li><a href="#general">Extension General Definition</a></li>
+<li><a href="#actions">Features and Actions</a></li>
+<li><a href="#configuration">Configuration</a></li>
+<li><a href="#field-mapping">Field Mapping</a></li>
+</ol>
+<p><i class="far fa-code" title="Learn by example"></i> <strong>Learn by example</strong></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;unique-identifier&quot;</span><span class="fu">,</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;svgString&quot;</span><span class="fu">:</span> <span class="st">&quot;&lt;svg&gt;&lt;/svg&gt;&quot;</span><span class="fu">,</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;details&quot;</span><span class="fu">:</span> <span class="fu">{},</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;features&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;trigger&quot;</span><span class="fu">:</span> <span class="st">&quot;scheduler&quot;</span><span class="fu">,</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;actions&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{}</span><span class="ot">,</span> <span class="fu">{}</span><span class="ot">]</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>            <span class="fu">}</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;config&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{}</span><span class="ot">,</span> <span class="fu">{}</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;mapping&quot;</span><span class="fu">:</span> <span class="ot">[]</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span></code></pre></div>
+<p><a name="general"></a></p>
+<h2 id="examples">Examples</h2>
+<p>All these examples include the code and a tutorial. It is recommended to start with the first and go into more complex examples as you understand the simpler ones.</p>
+<ul>
+<li><a href="https://github.com/itmplatform/extension-documentation/tree/main/example-1">Example 1</a>. When a project updates, send a message to a static email address.
+<ul>
+<li>Event-based</li>
+<li>Minimal configuration: activation only</li>
+</ul></li>
+<li><a href="https://github.com/itmplatform/extension-documentation/tree/main/example-2">Example 2</a>. When a purchase's actual value updates, send an email to a static address if the amount exceeds the purchase budget.
+<ul>
+<li>Event-based</li>
+<li>Using conditions</li>
+</ul></li>
+<li><a href="https://github.com/itmplatform/extension-documentation/tree/main/example-3">Example 3</a>. Send a daily email to the project manager of a specific project containing all tasks whose end date is later than today.
+<ul>
+<li>Scheduler-based</li>
+<li>Loop and conditions</li>
+</ul></li>
+<li><a href="https://github.com/itmplatform/extension-documentation/tree/main/example-4">Example 4</a>. Synchronize ITM Platform's clients with Hubspot's companies: only those having the Hubspot's property <code>sync_itm_platform</code> set to <code>true</code>.
+<ul>
+<li>Scheduler-based</li>
+<li>Connector to a third-party system</li>
+</ul></li>
+<li><a href="https://github.com/itmplatform/extension-documentation/tree/main/example-5">Example 5</a>. Allow users to input revenue's Actual Amount if &lt;= Projected Amount.
+<ul>
+<li>Event-based, synchronous</li>
+</ul></li>
+</ul>
+<h2 id="extension-general-definition">Extension General Definition</h2>
+<p><i class="far fa-code" title="Learn by example"></i> <strong>Learn by example</strong></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;unique-name&quot;</span><span class="fu">,</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;svgString&quot;</span><span class="fu">:</span> <span class="st">&quot;&lt;svg xmlns=&#39;http://www.w3.org/2000/svg&#39; fill=&#39;#495d73&#39; viewBox=&#39;0 0 640 512&#39;&gt;&lt;path d=&#39;M640 256c0 35.35-21.49 64-48 64c-32.43 0-31.72-32-55.64-32C522.9 288 512 298.9 512 312.4V416c0 17.67-14.33 32-32 32h-103.6C362.9 448 352 437.1 352 423.6C352 399.1 384 400.4 384 368c0-26.51-28.65-48-64-48s-64 21.49-64 48c0 32.43 32 31.72 32 55.64C288 437.1 277.1 448 263.6 448H160c-17.67 0-32-14.33-32-32V312.4C128 298.9 117.1 288 103.6 288C79.95 288 80.4 320 48 320c-26.51 0-47.1-28.65-47.1-64S21.49 191.1 48 191.1c32.43 0 31.72 32 55.64 32C117.1 223.1 128 213.1 128 199.6V95.1C128 78.33 142.3 63.1 160 63.1l103.6 0C277.1 63.1 288 74.9 288 88.36C288 112 256 111.6 256 143.1C256 170.5 284.7 192 320 192s64-21.49 64-48c0-32.43-32-31.72-32-55.64c0-13.45 10.91-24.36 24.36-24.36L480 63.1c17.67 0 32 14.33 32 32v103.6c0 13.45 10.91 24.36 24.36 24.36c23.69 0 23.24-32 55.64-32C618.5 191.1 640 220.7 640 256z&#39;/&gt;&lt;/svg&gt;&quot;</span><span class="fu">,</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;details&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;title&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;en&quot;</span><span class="fu">:</span> <span class="st">&quot;My Extension&quot;</span><span class="fu">,</span><span class="dt">&quot;es&quot;</span><span class="fu">:</span> <span class="st">&quot;Mi extensión&quot;</span><span class="fu">,</span><span class="dt">&quot;pt&quot;</span><span class="fu">:</span> <span class="st">&quot;Meu extençao&quot;</span><span class="fu">},</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;version&quot;</span><span class="fu">:</span> <span class="st">&quot;0.8&quot;</span><span class="fu">,</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;shortDescription&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;en&quot;</span><span class="fu">:</span> <span class="st">&quot;desc&quot;</span><span class="fu">,</span><span class="dt">&quot;es&quot;</span><span class="fu">:</span> <span class="st">&quot;desc&quot;</span><span class="fu">,</span><span class="dt">&quot;pt&quot;</span><span class="fu">:</span> <span class="st">&quot;desc&quot;</span><span class="fu">},</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;longDescription&quot;</span><span class="fu">:</span>  <span class="fu">{</span><span class="dt">&quot;en&quot;</span><span class="fu">:</span> <span class="st">&quot;long desc&quot;</span><span class="fu">,</span><span class="dt">&quot;es&quot;</span><span class="fu">:</span> <span class="st">&quot;long desc&quot;</span><span class="fu">,</span><span class="dt">&quot;pt&quot;</span><span class="fu">:</span> <span class="st">&quot;long desc&quot;</span><span class="fu">},</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;updated&quot;</span><span class="fu">:</span> <span class="st">&quot;2022-05-25&quot;</span><span class="fu">,</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;developer&quot;</span><span class="fu">:</span> <span class="st">&quot;developer-name&quot;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span>        </span></code></pre></div>
+<p><i class="fad fa-book-open" title="Guide"></i> <strong>Guide</strong></p>
+<p>The general definition will provide basic information about the extension you are building. The title, the short description, and the icon will appear on the extension button within the extension panel.</p>
+<p><i class="fad fa-brackets" title="Reference"></i> <strong>Reference</strong></p>
+<ul>
+<li><p><code>name</code>: It will be used as a identifier for the extension and must be unique. It can't have spaces or special characters.</p></li>
+<li><p><code>svgString</code>: Inline SVG that will be used as the extension icon.</p></li>
+<li><p><code>details</code></p>
+<ul>
+<li><code>title</code>: Main identifier of the extension for the end-user. It accepts <a href="#multi-language">multi-language</a></li>
+<li><code>version</code>: Version number. Take into account that the system will not store previous versions.</li>
+<li><code>shortDescription</code>It will appear in the extension panel. It accepts <a href="#multi-language">multi-language</a></li>
+<li><code>longDescription</code>: It accepts <a href="#multi-language">multi-language</a></li>
+<li><code>updated</code>: yyyy-mmm-dd date format</li>
+<li><code>developer</code>: Who developed the extension</li>
+</ul>
+<h3 id="checkpoints">Checkpoints</h3>
+<ul>
+<li>Extension <code>name</code> must exist and be unique</li>
+</ul></li>
+</ul>
+<p><a name="actions"></a></p>
+<h2 id="features">Features</h2>
+<p><i class="far fa-code" title="Learn by example"></i> <strong>Learn by example</strong></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span><span class="dt">&quot;features&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;trigger&quot;</span><span class="fu">:</span> <span class="st">&quot;event&quot;</span><span class="fu">,</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;extension&quot;</span><span class="fu">:</span> <span class="st">&quot;providers-demo&quot;</span><span class="fu">,</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;entity&quot;</span><span class="fu">:</span> <span class="st">&quot;Project&quot;</span><span class="fu">,</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;description&quot;</span><span class="fu">:</span> <span class="st">&quot;Retrieving providers&quot;</span><span class="fu">,</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;event&quot;</span><span class="fu">:</span> <span class="st">&quot;updated&quot;</span><span class="fu">,</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;actions&quot;</span><span class="fu">:</span> <span class="ot">[]</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
+<p><i class="fad fa-book-open" title="Guide"></i> <strong>Guide</strong></p>
+<p>The Features section defines the behavior of the extension. It determines what will trigger it, and the actions that will follow.</p>
+<p>When a feature is triggered by an event, such as a task update, you must specify the <code>entity</code>(task, in our example) and the <code>event</code> (update, in the same example).</p>
+<p>When the feature is triggered by the scheduler, you must create the <a href="#synchronization-frequency-&quot;name&quot;-&quot;synchronizationfrequency&quot;">synchronization frequency</a> configuration option, so the user can set the value.</p>
+<p><i class="fad fa-brackets" title="Reference"></i> <strong>Reference</strong></p>
+<p>(*) Denotes a mandatory field</p>
+<ul>
+<li><p><code>trigger</code>: It can be <code>event</code> or <code>scheduler</code> *</p></li>
+<li><p><code>entity</code>: <a href="#terminology">Entities</a> * mandatory for the <code>event</code> trigger</p></li>
+<li><p><code>event</code> <a href="#Events">System Events</a> * mandatory for the <code>event</code> trigger</p></li>
+<li><p><code>async</code>: <code>true</code> or <code>false</code> It applies to the <code>event</code> trigger and determines whether the execution in ITM Platform that triggered it will stop (<code>false</code>) or the extension will run in a parallel thread (<code>true</code>). The default value is <code>async</code>: <code>true</code> if not specified.</p></li>
+<li><p><code>description</code>: Useful for extension developers. It will not be displayed to the end-user.</p></li>
+<li><p><code>actions</code>: An array of <a href="#actions">actions</a>.</p>
+<p>⚠️ If you make the feature synchronous (<code>async: false</code>), the execution in ITM Platform will pause until the extension responds, resulting in a potential lousy user experience. Make features synchronous only when necessary, and keep the logic as simple as possible. For example, when validating user inputs.</p></li>
+</ul>
+<h3 id="checkpoints-1">Checkpoints</h3>
+<ul>
+<li>Each extension should contain at least one feature.</li>
+<li>Triggers must be either <code>scheduler</code> or <code>event</code></li>
+<li>Each feature will have actions array.</li>
+</ul>
+<h2 id="actions">Actions</h2>
+<p><i class="far fa-code" title="Learn by example"></i> <strong>Learn by example</strong></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>     <span class="fu">{</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;action&quot;</span><span class="fu">:</span> <span class="st">&quot;restcall&quot;</span><span class="fu">,</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;url&quot;</span><span class="fu">:</span> <span class="st">&quot;https://api.itmplatform.com/v2/mycompany/projects/{{ input.project.Id }}&quot;</span><span class="fu">,</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;method&quot;</span><span class="fu">:</span> <span class="st">&quot;GET&quot;</span><span class="fu">,</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;token&quot;</span><span class="fu">:</span> <span class="st">&quot;{{ logininfo.Token }}&quot;</span><span class="fu">,</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;description&quot;</span><span class="fu">:</span> <span class="st">&quot;Retrieve project&quot;</span><span class="fu">,</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;output&quot;</span><span class="fu">:</span> <span class="st">&quot;project&quot;</span><span class="fu">,</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;payload&quot;</span><span class="fu">:</span> <span class="st">&quot;&quot;</span><span class="fu">,</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;headers&quot;</span><span class="fu">:</span> <span class="st">&quot;{</span><span class="ch">\&quot;</span><span class="st">token</span><span class="ch">\&quot;</span><span class="st"> : </span><span class="ch">\&quot;</span><span class="st">{{ logininfo.Token }}</span><span class="ch">\&quot;</span><span class="st">, </span><span class="ch">\&quot;</span><span class="st">myheader</span><span class="ch">\&quot;</span><span class="st"> : </span><span class="ch">\&quot;</span><span class="st">header value</span><span class="ch">\&quot;</span><span class="st">}&quot;</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;dataType&quot;</span><span class="er">:</span> <span class="st">&quot;application/json&quot;</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span></code></pre></div>
+<p><i class="fad fa-book-open" title="Guide"></i> <strong>Guide</strong></p>
+<p>Actions are pieces of code executed when a feature is triggered. Actions are typically chained to one another by sending the <code>output</code> value from the parent action to the child action.</p>
+<p>Actions admit <a href="#loops">loops</a> and <a href="#conditionals">conditionals</a>.</p>
+<p><i class="fad fa-brackets" title="Reference"></i> <strong>Reference</strong></p>
+<ul>
+<li><code>action</code>: specifies the action type from the different <a href="">action types</a>.</li>
+<li><code>token</code>: Used to call the ITM Platform API <!--reference--></li>
+<li><code>description</code>: For developers</li>
+<li><code>output</code>: <a href="#output-object">output object</a> used in further actins as the <code>input</code> object <!-- reference. --></li>
+<li><code>payload</code>: body of the request. It supports <a href="#template-syntax">templates</a>, used to replace text with variable content.</li>
+<li><code>headers</code>: Optional. Valid for <code>restcall</code> only. You can pass additional required headers to the rest call</li>
+<li><code>token</code>: Optional. Valid to call ITM Platform's api. Shortcut to adding it as a header, like so: <code>"headers": "{\"token\" : \"{{ logininfo.Token }}\"}"</code></li>
+<li><code>dataType</code>: Optional. It will parse the result as JSON or XML. Possible values are <code>application/json</code> and <code>application/xml</code>. When omitted, the result will be a string.</li>
+</ul>
+<h4 id="checkpoints-2">Checkpoints</h4>
+<p>When saving an extension, the following validations will run. If the script doesn't pass them, you will be able to save it but not activate the extension.</p>
+<ul>
+<li>The action value can be one of: <code>restcall</code>, <code>soapcall</code>, <code>validate</code>, <code>map</code>, <code>email</code>, or <code>loop</code></li>
+<li>If the action value is <code>restcall</code>, it can contain <code>url</code>, <code>method</code> (defaults to <code>GET</code>) and <code>payload</code> (not mandatory).</li>
+<li>If the action value is <code>restcall</code>, it can have a <code>condition</code>.</li>
+<li>If the action value is <code>soapcall</code>, it must include a <code>soapaction</code>, <code>url</code> and <code>payload</code>.</li>
+<li>If the action value is <code>restcall</code> or <code>soapcall</code>, there is an authentication attribute and its value is basic, it must have username and password. <!--explain this ?--></li>
+<li>If the action value is <code>validate</code>, it must have <code>validationCondition</code> and <code>message</code>.</li>
+<li>If the action value is <code>map</code>, it must have <code>template</code>.</li>
+<li>If the action value is <code>loop</code>, it must have <code>var</code>, <code>condition</code>, <code>actions</code> and <code>output</code>.</li>
+</ul>
+<h3 id="action-types">Action Types</h3>
+<p>The <code>action</code> value can be one of: <code>restcall</code>, <code>soapcall</code>, <code>validate</code>, <code>map</code>, <code>email</code>, or <code>loop</code></p>
+<h4 id="action-restcall">"action": "restcall"</h4>
+<p>Performs a <a href="https://en.wikipedia.org/wiki/Representational_state_transfer" target="_blank">REST call</a> to any third-party API or ITM Platform's.</p>
+<p><i class="far fa-code" title="Learn by example"></i> <strong>Learn by example</strong></p>
+<!-- We already explained all this. See a way to not repeat ourselves, but keep it understandable with requiring to read the whole document-->
+
+<div class="sourceCode" id="cb5"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;action&quot;</span><span class="fu">:</span> <span class="st">&quot;restcall&quot;</span><span class="fu">,</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;url&quot;</span><span class="fu">:</span> <span class="st">&quot;https://jsonplaceholder.typicode.com/todos/&quot;</span><span class="fu">,</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;method&quot;</span><span class="fu">:</span> <span class="st">&quot;GET&quot;</span><span class="fu">,</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;description&quot;</span><span class="fu">:</span> <span class="st">&quot;Retrieves a to-do list&quot;</span><span class="fu">,</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;output&quot;</span><span class="fu">:</span> <span class="st">&quot;todos&quot;</span><span class="fu">,</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;payload&quot;</span><span class="fu">:</span> <span class="st">&quot;&quot;</span><span class="fu">,</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;dataType&quot;</span><span class="fu">:</span> <span class="st">&quot;application/json&quot;</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span></code></pre></div>
+<p><i class="fad fa-book-open" title="Guide"></i> <strong>Guide</strong></p>
+<p>A REST call is the most common way to get or post data in any API, including ITM Platform's. Use it as you would with any tool, such as Postman, <code>curl</code>, or your favorite programming language.</p>
+<p><i class="fad fa-brackets" title="Reference"></i> <strong>Reference</strong></p>
+<ul>
+<li><code>action</code>: Must be <code>restcall</code></li>
+<li><code>url</code>: See the <a href="#url">url</a> section.</li>
+<li><code>method</code>: specifies the HTTP method (<code>GET</code>, <code>POST</code>, <code>PUT</code>, <code>PATCH</code>, <code>DELETE</code>)</li>
+<li><code>description</code>: Reference for the developer</li>
+<li><code>output</code>: <a href="#output-object">output object</a> used in further actions</li>
+<li><code>payload</code>: body of the request.</li>
+<li><code>dataType</code>: is optional and it will parse the result as json so it can be send to any next step, if not passed then the result will be a string</li>
+</ul>
+<h4 id="action-soapcall">"action": "soapcall"</h4>
+<p>Performs a <a href="https://en.wikipedia.org/wiki/SOAP" target="_blank">SOAP call</a> to any third-party system.</p>
+<p><i class="far fa-code" title="Learn by example"></i> <strong>Learn by example</strong></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;action&quot;</span><span class="fu">:</span> <span class="st">&quot;soapcall&quot;</span><span class="fu">,</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;url&quot;</span><span class="fu">:</span> <span class="st">&quot;http://testurl.com/testservice&quot;</span><span class="fu">,</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;soapaction&quot;</span><span class="fu">:</span> <span class="st">&quot;testmethod&quot;</span><span class="fu">,</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;payload&quot;</span><span class="fu">:</span> <span class="st">&quot;&lt;soapenv:Envelope xmlns:soapenv=</span><span class="ch">\&quot;</span><span class="st">http://schemas.xmlsoap.org/soap/envelope/</span><span class="ch">\&quot;</span><span class="st"> xmlns:tem=</span><span class="ch">\&quot;</span><span class="st">http://tempuri.org/</span><span class="ch">\&quot;</span><span class="st">&gt;&lt;soapenv:Header/&gt;&lt;soapenv:Body&gt;&lt;tem:CallPost&gt;&lt;tem:name&gt;{{ input.SomeInt }}&lt;/tem:name&gt;&lt;/tem:CallPost&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt;&quot;</span><span class="fu">,</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;dataType&quot;</span><span class="fu">:</span>  <span class="st">&quot;application/json&quot;</span><span class="fu">,</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;authentication&quot;</span><span class="fu">:</span> <span class="st">&quot;basic&quot;</span><span class="fu">,</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;user&quot;</span><span class="fu">:</span> <span class="st">&quot;testuser&quot;</span><span class="fu">,</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;pass&quot;</span><span class="fu">:</span> <span class="st">&quot;testpass&quot;</span><span class="fu">,</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;output&quot;</span><span class="fu">:</span> <span class="st">&quot;jsonoutput&quot;</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p><i class="fad fa-book-open" title="Guide"></i> <strong>Guide</strong></p>
+<p>A SOAP action will require a <code>url</code>, a <code>soapaction</code>, a <code>payload</code> and an <code>output</code>. The <code>dataType</code> attribute must be <code>"application/json"</code>. It can also include an authentication attribute, along with <code>user</code> and <code>pass</code>.</p>
+<p><strong>Data Types</strong></p>
+<p>The following example parses the <code>output</code> as xml, which can be used later on to retrieve values with mapping</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;action&quot;</span><span class="fu">:</span> <span class="st">&quot;soapcall&quot;</span><span class="fu">,</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;url&quot;</span><span class="fu">:</span> <span class="st">&quot;http://testurl.com/testservice&quot;</span><span class="fu">,</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;soapaction&quot;</span><span class="fu">:</span> <span class="st">&quot;testmethod&quot;</span><span class="fu">,</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;payload&quot;</span><span class="fu">:</span> <span class="st">&quot;{{ output1 }}&quot;</span><span class="fu">,</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;dataType&quot;</span><span class="fu">:</span>  <span class="st">&quot;application/xml&quot;</span><span class="fu">,</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;output&quot;</span><span class="fu">:</span> <span class="st">&quot;dataoutput&quot;</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;action&quot;</span><span class="fu">:</span> <span class="st">&quot;soapcall&quot;</span><span class="fu">,</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;url&quot;</span><span class="fu">:</span> <span class="st">&quot;http://testurl.com/testservice&quot;</span><span class="fu">,</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;soapaction&quot;</span><span class="fu">:</span> <span class="st">&quot;testmethod&quot;</span><span class="fu">,</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;payload&quot;</span><span class="fu">:</span> <span class="st">&quot;{{ output1 }}&quot;</span><span class="fu">,</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;dataType&quot;</span><span class="fu">:</span>  <span class="st">&quot;application/json&quot;</span><span class="fu">,</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;output&quot;</span><span class="fu">:</span> <span class="st">&quot;dataoutput&quot;</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p><i class="fad fa-brackets" title="Reference"></i> <strong>Reference</strong></p>
+<ul>
+<li><code>action</code>: Must be <code>soapcall</code></li>
+<li><code>soapaction</code>: SOAP action</li>
+<li><code>url</code>: SOAP URL</li>
+<li><code>payload</code>: The payload of the SOAP Action needs to be a SOAP Envelop message like specified here <a href="https://www.tutorialspoint.com/soap/soap_message_structure.htm">https://www.tutorialspoint.com/soap/soap_message_structure.htm</a> The easiest way to create an envelop that you can use later, is to use a tool like <a href="https://www.soapui.org/" tagert="_blank">SOAPUI</a>, and then replace the values.</li>
+<li><code>authentication</code>: The type of authentication required, if any. The accepted values are.
+<ul>
+<li><code>basic</code> which will require <code>user</code> and <code>pass</code></li>
+<li><code>token</code> which will require <code>token</code></li>
+</ul></li>
+<li><code>user</code>: User name when basic authentication is required.</li>
+<li><code>pass</code>: Password when basic authentication is required.</li>
+<li><code>token</code>: Bearer token when token authentication is required</li>
+</ul>
+<h4 id="action-map">action": "map"</h4>
+<p><i class="far fa-code" title="Learn by example"></i> <strong>Learn by example</strong></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;action&quot;</span><span class="fu">:</span> <span class="st">&quot;map&quot;</span><span class="fu">,</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;template&quot;</span><span class="fu">:</span> <span class="st">&quot;{ </span><span class="ch">\&quot;</span><span class="st">name</span><span class="ch">\&quot;</span><span class="st">: </span><span class="ch">\&quot;</span><span class="st">{{ input.name }}</span><span class="ch">\&quot;</span><span class="st">, </span><span class="ch">\&quot;</span><span class="st">value</span><span class="ch">\&quot;</span><span class="st">: </span><span class="ch">\&quot;</span><span class="st">{{ input.value }}</span><span class="ch">\&quot;</span><span class="st"> }&quot;</span><span class="fu">,</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;dataType&quot;</span><span class="fu">:</span> <span class="st">&quot;application/json&quot;</span><span class="fu">,</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;output&quot;</span><span class="fu">:</span> <span class="st">&quot;outputVar&quot;</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span></code></pre></div>
+<p><i class="fad fa-book-open" title="Guide"></i> <strong>Guide</strong></p>
+<p>The <code>map</code> actions allow mapping values from existing variables. In the example above, the variables <code>name</code> and <code>value</code> coming from <code>input</code> will be transformed to JSON.</p>
+<p><i class="fad fa-brackets" title="Reference"></i> <strong>Reference</strong></p>
+<ul>
+<li><code>template</code>: See <a href="#template-syntax">template syntax</a></li>
+<li><code>output</code>: <a href="#output-object">output object</a> used in other actions.</li>
+<li><code>dataType</code>: is optional, and it will parse the result as JSON so it can be sent to any next step. when omitted the result will be a string</li>
+</ul>
+<h4 id="action-validate">"action": "validate"</h4>
+<p>Used in <code>synchronous</code> features, it performs a validation before proceeding.</p>
+<p><i class="far fa-code" title="Learn by example"></i> <strong>Learn by example</strong></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;action&quot;</span><span class="fu">:</span> <span class="st">&quot;validate&quot;</span><span class="fu">,</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;validateCondition&quot;</span><span class="fu">:</span> <span class="st">&quot;Convert.ToInt32(input.Status.Id) == 10 &amp;&amp; Convert.ToString(input.Description) == </span><span class="ch">\&quot;\&quot;</span><span class="st">&quot;</span><span class="fu">,</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;message&quot;</span><span class="fu">:</span> <span class="st">&quot;When using the status {{ input.Status.Description }} you need to provide a description&quot;</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span></code></pre></div>
+<p><i class="fad fa-book-open" title="Guide"></i> <strong>Guide</strong></p>
+<p>The <code>validate</code> action will require a <code>validationCondition</code>, and a <code>message</code> that will be displayed to the final user if the condition is not met. It is generally used to perform custom validations that may need to change the way ITM platform works. For example, if you need to validate that a particular field has a value depending on other fields.</p>
+<!-- These type of actions should not use async as they are meant to stop the processing and rollback whatever action was undergoing, but in the future maybe we can use this to record messages in the jobs when they execute from the scheduler to stop the processing of repeat tasks in case a validation is happening, this would allow us to avoid executing tasks that would fail in the scheduler. -->
+
+<p><i class="fad fa-brackets" title="Reference"></i> <strong>Reference</strong></p>
+<ul>
+<li><code>action</code>: <code>validate</code></li>
+<li><code>validateCondition</code>: It follows the same rules and syntax of <a href="https://github.com/itmplatform/extension-documentation#action-conditionals">action conditionals</a></li>
+<li><code>message</code>: String displayed to the final user in the ITM Platform's interface in case the condition is not met.</li>
+</ul>
+<h4 id="action-email">"action": "email"</h4>
+<p>Sends an email to the given address/es</p>
+<p><i class="far fa-code" title="Learn by example"></i> <strong>Learn by example</strong></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>          <span class="dt">&quot;action&quot;</span><span class="fu">:</span> <span class="st">&quot;email&quot;</span><span class="fu">,</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>          <span class="dt">&quot;to&quot;</span><span class="fu">:</span> <span class="st">&quot;yourname@yourcompany.com&quot;</span><span class="fu">,</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>          <span class="dt">&quot;subject&quot;</span><span class="fu">:</span> <span class="st">&quot;This subject admits templates&quot;</span><span class="fu">,</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>          <span class="dt">&quot;body&quot;</span><span class="fu">:</span> <span class="st">&quot;&lt;html&gt;&lt;h1&gt;This email body admits templates too!&lt;/h1&gt;&lt;/html&gt;&quot;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span></span></code></pre></div>
+<p><i class="fad fa-book-open" title="Guide"></i> <strong>Guide</strong></p>
+<p>Sends an email to the specified recipient(s). The sender will be <a href="mailto:notifier@itmplatorm.com">notifier@itmplatorm.com</a>, an address that doesn't admit replies.</p>
+<p><i class="fad fa-brackets" title="Reference"></i> <strong>Reference</strong></p>
+<ul>
+<li><code>action</code>: Must be <code>email</code></li>
+<li><code>to</code>: Mandatory, indicates a comma-separated list of email addresses.</li>
+<li><code>subject</code>: Contains the subject text. It allows templates.</li>
+<li><code>body</code>: contains the message body. It allows templates.</li>
+</ul>
+<h4 id="action-loop">"action": "loop"</h4>
+<p>The <code>loop</code>action will iterate over elements coming from previous calls.</p>
+<p>There are different types of loops: simple, with variables, an with variables and conditions.</p>
+<h5 id="simple-loops">Simple loops</h5>
+<p><i class="far fa-code" title="Learn by example"></i> <strong>Learn by example</strong></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a> <span class="fu">{</span> </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;trigger&quot;</span><span class="fu">:</span> <span class="st">&quot;event&quot;</span><span class="fu">,</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;event&quot;</span><span class="fu">:</span> <span class="st">&quot;updated&quot;</span><span class="fu">,</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;entity&quot;</span><span class="fu">:</span> <span class="st">&quot;Project&quot;</span><span class="fu">,</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;actions&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;action&quot;</span><span class="fu">:</span> <span class="st">&quot;loop&quot;</span><span class="fu">,</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;loop&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;var&quot;</span><span class="fu">:</span> <span class="st">&quot;myarray&quot;</span><span class="fu">,</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;output&quot;</span><span class="fu">:</span> <span class="st">&quot;item&quot;</span><span class="fu">,</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;index&quot;</span><span class="fu">:</span> <span class="st">&quot;index&quot;</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;actions&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>                <span class="fu">{</span> </span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;action&quot;</span><span class="fu">:</span> <span class="st">&quot;restcall&quot;</span><span class="fu">,</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;url&quot;</span><span class="fu">:</span> <span class="st">&quot;http://your-company/{{ item.name }}/{{ index }}&quot;</span><span class="fu">,</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;method&quot;</span><span class="fu">:</span> <span class="st">&quot;post&quot;</span><span class="fu">,</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>                <span class="fu">}</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>            <span class="ot">]</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span> </span></code></pre></div>
+<p><i class="fad fa-book-open" title="Guide"></i> <strong>Guide</strong></p>
+<p>A loop action will parse an object coming from a previous action and run an actions array over the outcome.</p>
+<p><i class="fad fa-brackets" title="Reference"></i> <strong>Reference</strong></p>
+<h5 id="loops-with-variables">Loops with variables</h5>
+<p>We can also loop with variables inside an action. For example:</p>
+<p><i class="far fa-code" title="Learn by example"></i> <strong>Learn by example</strong></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;trigger&quot;</span><span class="fu">:</span> <span class="st">&quot;event&quot;</span><span class="fu">,</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;event&quot;</span><span class="fu">:</span> <span class="st">&quot;updated&quot;</span><span class="fu">,</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;entity&quot;</span><span class="fu">:</span> <span class="st">&quot;Project&quot;</span><span class="fu">,</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;action&quot;</span><span class="fu">:</span> <span class="st">&quot;loop&quot;</span><span class="fu">,</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;loop&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;var&quot;</span><span class="fu">:</span> <span class="st">&quot;myarray.values&quot;</span><span class="fu">,</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;output&quot;</span><span class="fu">:</span> <span class="st">&quot;singleElement&quot;</span><span class="fu">,</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;actions&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;action&quot;</span><span class="fu">:</span> <span class="st">&quot;restcall&quot;</span><span class="fu">,</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;url&quot;</span><span class="fu">:</span> <span class="st">&quot;http://testurl.com/testapi&quot;</span><span class="fu">,</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;method&quot;</span><span class="fu">:</span> <span class="st">&quot;POST&quot;</span><span class="fu">,</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;payload&quot;</span><span class="fu">:</span> <span class="st">&quot;{</span><span class="ch">\&quot;</span><span class="st">Columns</span><span class="ch">\&quot;</span><span class="st">: </span><span class="ch">\&quot;</span><span class="st">Id,Name,JiraId,Type.Id,MethodTypeId</span><span class="ch">\&quot;</span><span class="st">,</span><span class="ch">\&quot;</span><span class="st">filter</span><span class="ch">\&quot;</span><span class="st">: { </span><span class="ch">\&quot;</span><span class="st">JiraId</span><span class="ch">\&quot;</span><span class="st"> : {{ singleElement.id }} } }&quot;</span><span class="fu">,</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;output&quot;</span><span class="fu">:</span> <span class="st">&quot;outputVar&quot;</span><span class="fu">,</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;dataType&quot;</span><span class="fu">:</span> <span class="st">&quot;application/json&quot;</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span><span class="ot">,</span></span></code></pre></div>
+<p><i class="fad fa-book-open" title="Guide"></i> <strong>Guide</strong></p>
+<p><i class="fad fa-brackets" title="Reference"></i> <strong>Reference</strong></p>
+<h5 id="loops-with-variables-and-conditions">Loops with variables and conditions</h5>
+<p>We can also loop with variables and conditions inside an action. For an example: <i class="far fa-code" title="Learn by example"></i></p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;trigger&quot;</span><span class="fu">:</span> <span class="st">&quot;event&quot;</span><span class="fu">,</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;event&quot;</span><span class="fu">:</span> <span class="st">&quot;updated&quot;</span><span class="fu">,</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;entity&quot;</span><span class="fu">:</span> <span class="st">&quot;Project&quot;</span><span class="fu">,</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;action&quot;</span><span class="fu">:</span> <span class="st">&quot;loop&quot;</span><span class="fu">,</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;loop&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;var&quot;</span><span class="fu">:</span> <span class="st">&quot;myarray.values&quot;</span><span class="fu">,</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;output&quot;</span><span class="fu">:</span> <span class="st">&quot;singleElement&quot;</span><span class="fu">,</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;condition&quot;</span><span class="fu">:</span> <span class="st">&quot;somevariable != null&quot;</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;actions&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;action&quot;</span><span class="fu">:</span> <span class="st">&quot;restcall&quot;</span><span class="fu">,</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;url&quot;</span><span class="fu">:</span> <span class="st">&quot;http://testurl.com/testapi&quot;</span><span class="fu">,</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;method&quot;</span><span class="fu">:</span> <span class="st">&quot;POST&quot;</span><span class="fu">,</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;payload&quot;</span><span class="fu">:</span> <span class="st">&quot;{</span><span class="ch">\&quot;</span><span class="st">Columns</span><span class="ch">\&quot;</span><span class="st">: </span><span class="ch">\&quot;</span><span class="st">Id,Name,JiraId,Type.Id,MethodTypeId</span><span class="ch">\&quot;</span><span class="st">,</span><span class="ch">\&quot;</span><span class="st">filter</span><span class="ch">\&quot;</span><span class="st">: { </span><span class="ch">\&quot;</span><span class="st">JiraId</span><span class="ch">\&quot;</span><span class="st"> : {{ singleElement.id }} } }&quot;</span><span class="fu">,</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;output&quot;</span><span class="fu">:</span> <span class="st">&quot;outputVar&quot;</span><span class="fu">,</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;dataType&quot;</span><span class="fu">:</span> <span class="st">&quot;application/json&quot;</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;action&quot;</span><span class="fu">:</span> <span class="st">&quot;restcall&quot;</span><span class="fu">,</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;url&quot;</span><span class="fu">:</span> <span class="st">&quot;http://testurl.com/testapi&quot;</span><span class="fu">,</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;condition&quot;</span><span class="fu">:</span> <span class="st">&quot;Convert.ToInt32(outputVar.total) &gt; 0&quot;</span><span class="fu">,</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;method&quot;</span><span class="fu">:</span> <span class="st">&quot;PATCH&quot;</span><span class="fu">,</span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;payload&quot;</span><span class="fu">:</span> <span class="st">&quot;{</span><span class="ch">\&quot;</span><span class="st">Name</span><span class="ch">\&quot;</span><span class="st">: </span><span class="ch">\&quot;</span><span class="st">{{ singleElement.name }}</span><span class="ch">\&quot;</span><span class="st">,</span><span class="ch">\&quot;</span><span class="st">Description</span><span class="ch">\&quot;</span><span class="st">: </span><span class="ch">\&quot;</span><span class="st">{{ singleElement.description }}</span><span class="ch">\&quot;</span><span class="st"> }&quot;</span><span class="fu">,</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;output&quot;</span><span class="fu">:</span> <span class="st">&quot;updatedoutputVar&quot;</span><span class="fu">,</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;dataType&quot;</span><span class="fu">:</span> <span class="st">&quot;application/json&quot;</span></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span></span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p><i class="fad fa-book-open" title="Guide"></i> <strong>Guide</strong></p>
+<p><i class="fad fa-brackets" title="Reference"></i> <strong>Reference</strong></p>
+<h3 id="action-conditionals">Action conditionals</h3>
+<p>Conditionals</p>
+<p><i class="far fa-code" title="Learn by example"></i> <strong>Learn by example</strong></p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;action&quot;</span><span class="fu">:</span> <span class="st">&quot;restcall&quot;</span><span class="fu">,</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;url&quot;</span><span class="fu">:</span> <span class="st">&quot;https://api.hubapi.com/companies/v2/companies/recent/modified?hapikey={{config.apikeyHubspot }}&amp;since={{ context.LastExecution }}&quot;</span><span class="fu">,</span> </span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;condition&quot;</span><span class="fu">:</span> <span class="st">&quot;{{ context.LastExecution }} != null&quot;</span><span class="fu">,</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;method&quot;</span><span class="fu">:</span> <span class="st">&quot;GET&quot;</span><span class="fu">,</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;description&quot;</span><span class="fu">:</span> <span class="st">&quot;retrieve all clients filter lastExecutiondate&quot;</span><span class="fu">,</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;output&quot;</span><span class="fu">:</span> <span class="st">&quot;companiesHS&quot;</span><span class="fu">,</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;payload&quot;</span><span class="fu">:</span> <span class="st">&quot;&quot;</span><span class="fu">,</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;dataType&quot;</span><span class="fu">:</span> <span class="st">&quot;application/json&quot;</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span></code></pre></div>
+<p><i class="fad fa-book-open" title="Guide"></i> <strong>Guide</strong> You can put a condition to the event to check whether the actions should be executed.</p>
+<!-- The conditions are executed using .net framework, but to make it easier to write also supports templates, therefore a complex condition could be written like this:    -->
+
+<div class="sourceCode" id="cb15"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&quot;condition&quot;</span><span class="fu">:</span> <span class="st">&quot;{{input.SomeObject.Array.0.Array.1.SomeData}} == 3&quot;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<h2 id="extension-configuration">Extension Configuration</h2>
+<p>The <code>"config"</code> array will determine the content rendered in the extension's configuration tab on ITM Platform, displaying all fields required for your extension to operate.</p>
+<p><i class="far fa-code" title="Learn by example"></i> <strong>Learn by example</strong></p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>  <span class="fu">{</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;config&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>            <span class="fu">{</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;option-name&quot;</span><span class="fu">,</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;label&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;en&quot;</span><span class="fu">:</span> <span class="st">&quot;Label in English&quot;</span><span class="fu">,</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;es&quot;</span><span class="fu">:</span> <span class="st">&quot;Etiqueta en español&quot;</span><span class="fu">,</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;pt&quot;</span><span class="fu">:</span> <span class="st">&quot;Rótulo em inglês&quot;</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;tooltip&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;en&quot;</span><span class="fu">:</span> <span class="st">&quot;A brief description for the tooltip&quot;</span><span class="fu">,</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;es&quot;</span><span class="fu">:</span> <span class="st">&quot;Una breve descripción para el tooltip&quot;</span><span class="fu">,</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;pt&quot;</span><span class="fu">:</span> <span class="st">&quot;Uma breve descrição para o tooltip&quot;</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;date&quot;</span><span class="fu">,</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;required&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+<p><i class="fad fa-book-open" title="Guide"></i> <strong>Guide</strong></p>
+<p>These fields are represented by the <em>configuration options</em> within the <code>config</code> array.</p>
+<p>Once the user fills out the ITM Platform's "Configuration" tab, the values will be available through the <code>config</code> object, available to be used in <em>features</em> and <em>actions</em>.</p>
+<p>These are some examples of the usage of the <code>config</code> object throughout a script:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="er">&quot;url&quot;:</span> <span class="er">&quot;</span><span class="fu">{</span><span class="er">{</span> <span class="er">config.url</span> <span class="fu">}</span><span class="er">}/rest/api/3/project/search?maxResults=50&amp;startAt=0&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="er">&quot;username&quot;:</span> <span class="er">&quot;</span><span class="fu">{</span><span class="er">{</span> <span class="er">config.user</span> <span class="fu">}</span><span class="er">}&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="er">&quot;payload&quot;:</span> <span class="er">&quot;</span><span class="fu">{</span><span class="er">\</span><span class="dt">&quot;Name</span><span class="ch">\&quot;</span><span class="dt">: </span><span class="ch">\&quot;</span><span class="dt">{{ singlejiraproject.name }}</span><span class="ch">\&quot;</span><span class="dt">,</span><span class="ch">\&quot;</span><span class="dt">Description</span><span class="ch">\&quot;</span><span class="dt">: </span><span class="ch">\&quot;</span><span class="dt">{{ singlejiraproject.description }}</span><span class="ch">\&quot;</span><span class="dt">,</span><span class="ch">\&quot;</span><span class="dt">InternalCode</span><span class="ch">\&quot;</span><span class="dt">: </span><span class="ch">\&quot;</span><span class="dt">{{ singlejiraproject.key }}</span><span class="ch">\&quot;</span><span class="dt">,</span><span class="ch">\&quot;</span><span class="dt">JiraURL</span><span class="ch">\&quot;</span><span class="dt">: </span><span class="ch">\&quot;</span><span class="dt">{{ config.url }}</span><span class="ch">\&quot;</span><span class="dt">,</span><span class="ch">\&quot;</span><span class="dt">SynchronizationSource</span><span class="ch">\&quot;</span><span class="dt">: </span><span class="ch">\&quot;</span><span class="dt">Jira</span><span class="ch">\&quot;</span><span class="dt">{{#ifempty singlejiraproject.projectCategory }}{{else}},</span><span class="ch">\&quot;</span><span class="dt">TypeId</span><span class="ch">\&quot;</span><span class="dt">: </span><span class="ch">\&quot;</span><span class="dt">{{ map config.mapping.projecttype.external singlejiraproject.projectCategory.id }}</span><span class="ch">\&quot;</span><span class="dt">{{/ifempty}} }&quot;</span></span></code></pre></div>
+<p>These <em>configuration options</em> can define any <strong>custom value</strong> that you need to store (eg. the API key required to log in), but it also interprets a few <strong>hardcoded values</strong>.</p>
+<p>The identifier for each <em>configuration option</em> is the <code>name</code> property</p>
+<!-- In addition we've got
+syncafterdate. -> defaulttaskdurationindays (Duration in days in for tasks in ITM Platform that are synchronized from Jira issues that do not have an end date)
+But it is not clear how to use them -->
+
+<p><i class="fad fa-brackets" title="Reference"></i> <strong>Reference</strong></p>
+<ul>
+<li><code>name</code>: <em>Custom configuration options</em> accept any any valid unique name. <em>Hardcoded configuration options</em> are <code>"isactive"</code>, <code>"synchronizationfrequency"</code>, <code>"syncafterdate"</code></li>
+<li><code>label</code>: Message that will show before the user input. For example <code>"Start Date"</code></li>
+<li><code>tooltip</code>: Message that will show when the user hovers over the information icon.</li>
+<li><code>type</code>: Defines the type of the user input. The valid values are <code>string</code>, <code>password</code>, <code>checkbox</code>, <code>date</code>, <code>dropdown</code>, and <code>header</code>.</li>
+<li><code>required</code>: specifies if this configuration is required in order to execute the extension. It only applies to the types <code>string</code>, <code>password</code>, <code>date</code>, and <code>dropdown</code>.</li>
+</ul>
+<p>The <code>header</code> type will render regular section header Section headers on ITM Platform's configuration tab, adding a adding a visual separation between fields.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;config&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;header-credentials&quot;</span><span class="fu">,</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;label&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>                        <span class="dt">&quot;en&quot;</span><span class="fu">:</span> <span class="st">&quot;Credentials section&quot;</span><span class="fu">,</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>                        <span class="dt">&quot;es&quot;</span><span class="fu">:</span> <span class="st">&quot;Sección de credenciales&quot;</span><span class="fu">,</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>                        <span class="dt">&quot;pt&quot;</span><span class="fu">:</span> <span class="st">&quot;Seção de credenciais&quot;</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">},</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;header&quot;</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>                <span class="fu">}</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>        <span class="ot">]</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span></code></pre></div>
+<h3 id="hardcoded-configuration-options">Hardcoded configuration options</h3>
+<p>The hardcoded <em>configuration options</em> will be identified by their name and define a specific behavior in the <em>extension interpreter</em>. These hardcoded options are:</p>
+<ul>
+<li><code>"name": "isactive"</code></li>
+<li><code>"name": "synchronizationfrequency"</code></li>
+</ul>
+<h4 id="activate-the-extension-name-isactive">Activate the extension (<code>"name": "isactive"</code>)</h4>
+<p>Provides the option for the user to activate the extension within the "Configuration" tab.</p>
+<p><i class="far fa-code" title="Learn by example"></i> <strong>Learn by example</strong></p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;config&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>            <span class="fu">{</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;isactive&quot;</span><span class="fu">,</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;label&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;en&quot;</span><span class="fu">:</span> <span class="st">&quot;Activate connector&quot;</span><span class="fu">,</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;es&quot;</span><span class="fu">:</span> <span class="st">&quot;Activar conector&quot;</span><span class="fu">,</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;pt&quot;</span><span class="fu">:</span> <span class="st">&quot;Ativar o conector&quot;</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>                <span class="fu">},</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;tooltip&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;en&quot;</span><span class="fu">:</span> <span class="st">&quot;When selected, the connector will be active and will start synchronizing data&quot;</span><span class="fu">,</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;es&quot;</span><span class="fu">:</span> <span class="st">&quot;Cuando esté seleccionado, el conector estará activo y comenzará a sincronizar datos&quot;</span><span class="fu">,</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;pt&quot;</span><span class="fu">:</span> <span class="st">&quot;Quando selecionado, o conector estará ativo e começará a sincronizar dados&quot;</span></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>                <span class="fu">},</span></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;checkbox&quot;</span><span class="fu">,</span></span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>            <span class="fu">}</span></span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span></span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p><i class="fad fa-book-open" title="Guide"></i> <strong>Guide</strong> This will display a checkbox to activate the extension on the configuration tab in ITM Platform.</p>
+<p>⚠️ If you don't add this configuration, you will not be able to activate the extension later on.</p>
+<p><i class="fad fa-brackets" title="Reference"></i> <strong>Reference</strong></p>
+<p>Properties with special considerations:</p>
+<ul>
+<li><code>name</code>: Must be <code>"isactive"</code></li>
+<li><code>type</code>: Must be <code>"checkbox"</code></li>
+</ul>
+<h4 id="synchronization-frequency-name-synchronizationfrequency">Synchronization frequency (<code>"name": "synchronizationfrequency"</code>)</h4>
+<p>Provides the configuration option for the user to set the frequency at which the extension will be triggered. It is <em><strong>required</strong></em> when the feature is triggered by <code>scheduler</code></p>
+<p><i class="far fa-code" title="Learn by example"></i> <strong>Learn by example</strong></p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;config&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>            <span class="fu">{</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;synchronizationfrequency&quot;</span><span class="fu">,</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;label&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;en&quot;</span><span class="fu">:</span> <span class="st">&quot;Synchronization frequency (minutes)&quot;</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>                <span class="fu">},</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;tooltip&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;en&quot;</span><span class="fu">:</span> <span class="st">&quot;Frequency you wish to establish for the synchronization of the data from your account&quot;</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>                <span class="fu">},</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">,</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;required&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>            <span class="fu">}</span></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p><i class="fad fa-book-open" title="Guide"></i> <strong>Guide</strong> It will display in the "Configuration" tab a user input to introduce the synchronization frequency in minutes for the scheduler.</p>
+<p>The minimum frequency is 60 minutes. We recommend setting the frequency at the maximum your business case accepts.</p>
+<p>It will apply to the feature(s) that have the <code>scheduler</code> trigger.</p>
+<p><i class="fad fa-brackets" title="Reference"></i> <strong>Reference</strong></p>
+<p>Properties with special considerations:</p>
+<ul>
+<li><code>name</code>: Must be <code>"synchronizationfrequency"</code></li>
+<li><code>type</code>: Must be <code>"string"</code></li>
+</ul>
+<!-- This should be 'number' -->
+
+<h2 id="field-mapping">Field Mapping</h2>
+<p>The mapping configuration allows you to establish an equivalence between two systems, typically ITM Platform and a third party.</p>
+<p>This is useful to create synchronizations based on the values of one or more fields.</p>
+<p>As an extension developer, you don't set those relationships. You give the user the means to create relationships in the configuration tab in ITM Platform.</p>
+<p><i class="far fa-code" title="Learn by example"></i> <strong>Learn by example</strong></p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a> <span class="dt">&quot;mapping&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;projecttype&quot;</span><span class="fu">,</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;label&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;en&quot;</span><span class="fu">:</span> <span class="st">&quot;Project Type&quot;</span><span class="fu">,</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;es&quot;</span><span class="fu">:</span> <span class="st">&quot;Tipo de proyecto&quot;</span><span class="fu">,</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;pt&quot;</span><span class="fu">:</span> <span class="st">&quot;Tipo de Projeto&quot;</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;external&quot;</span><span class="fu">:</span> <span class="fu">{</span> </span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;method&quot;</span><span class="fu">:</span> <span class="st">&quot;GET&quot;</span><span class="fu">,</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;url&quot;</span><span class="fu">:</span> <span class="st">&quot;@@url@@/rest/api/3/project/type&quot;</span><span class="fu">,</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;authentication&quot;</span><span class="fu">:</span> <span class="st">&quot;Basic&quot;</span><span class="fu">,</span></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;user&quot;</span><span class="fu">:</span> <span class="st">&quot;@@user@@&quot;</span><span class="fu">,</span></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;pass&quot;</span><span class="fu">:</span> <span class="st">&quot;@@pass@@&quot;</span><span class="fu">,</span></span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;id&quot;</span><span class="fu">:</span> <span class="st">&quot;key&quot;</span><span class="fu">,</span></span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;formattedKey&quot;</span><span class="fu">,</span></span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;columnName&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;en&quot;</span><span class="fu">:</span> <span class="st">&quot;Jira&quot;</span><span class="fu">,</span></span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;es&quot;</span><span class="fu">:</span> <span class="st">&quot;Jira&quot;</span><span class="fu">,</span></span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;pt&quot;</span><span class="fu">:</span> <span class="st">&quot;Jira&quot;</span></span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>                <span class="fu">}</span></span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>            <span class="fu">},</span></span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>            <span class="dt">&quot;internal&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;method&quot;</span><span class="fu">:</span> <span class="st">&quot;GET&quot;</span><span class="fu">,</span></span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;url&quot;</span><span class="fu">:</span> <span class="st">&quot;v2/@@companyId@@/GetProjectTypes&quot;</span><span class="fu">,</span></span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;id&quot;</span><span class="fu">:</span> <span class="st">&quot;Id&quot;</span><span class="fu">,</span></span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;Name&quot;</span><span class="fu">,</span></span>
+<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;columnName&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;en&quot;</span><span class="fu">:</span> <span class="st">&quot;ITM Platform&quot;</span><span class="fu">,</span></span>
+<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;es&quot;</span><span class="fu">:</span> <span class="st">&quot;ITM Platform&quot;</span><span class="fu">,</span></span>
+<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a>                    <span class="dt">&quot;pt&quot;</span><span class="fu">:</span> <span class="st">&quot;ITM Platform&quot;</span></span>
+<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a>                <span class="fu">}</span></span>
+<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a>            <span class="fu">}</span></span>
+<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span></span>
+<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a> <span class="ot">]</span></span>
+<span id="cb23-37"><a href="#cb23-37" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<!-- v2/@@companyId@@/ won't work -->
+
+<!-- Explain "@@user@@", "@@pass@@" -->
+
+<p><i class="fad fa-book-open" title="Guide"></i> <strong>Guide</strong></p>
+<p>In the example above, the configuration panel will show two columns filled with the project types of ITM Platform and another with the project types of Jira. This will allow the user to establish that --for example- the project type "Software" in ITM Platform is equivalent to the project "Development" in Jira.</p>
+<!-- Insert image -->
+
+<p><i class="fad fa-brackets" title="Reference"></i> <strong>Reference</strong></p>
+<ul>
+<li><code>external</code>: The system A.</li>
+<li><code>internal</code>: The system B.</li>
+<li><code>url</code>: Endpoint that will gather the values.</li>
+<li><code>authentication</code>: The type of authentication required, if any. The accepted values are.
+<ul>
+<li><code>basic</code> which will require <code>user</code> and <code>pass</code></li>
+<li><code>token</code> which will require <code>token</code></li>
+</ul></li>
+<li><code>user</code>: User name when basic authentication is required.</li>
+<li><code>pass</code>: Password when basic authentication is required.</li>
+<li><code>token</code>: Bearer token when token authentication is required</li>
+<li><code>id</code>: ID or name of the property containing the value of interest.</li>
+<li><code>name</code>: Name displayed</li>
+<li><code>columnName</code>: Label for the column that will appear in the config panel</li>
+</ul>
+<h1 id="event-reference">Event Reference</h1>
+<p>The following are the events that ITM Platform triggers.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Trigger</th>
+<th>Entity</th>
+<th>Action</th>
+<th>When</th>
+<th>Input</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>scheduler</td>
+<td></td>
+<td></td>
+<td>This executes from scheduler</td>
+<td>context.LastExecution</td>
+</tr>
+<tr class="even">
+<td>event</td>
+<td>Task</td>
+<td>inserted</td>
+<td>When a task is inserted</td>
+<td><code>{ { "accountId", accountId }, { "projectId", projectId },  { "userId", userId }, { "task": { "Id", taskId }, { "Name", taskName }, { "JiraTaskId", JiraTaskId }, { "KindId", taskKindId }}}</code></td>
+</tr>
+<tr class="odd">
+<td>event</td>
+<td>Task</td>
+<td>updated</td>
+<td>When a task is updated</td>
+<td><code> { { "accountId", accountId }, { "projectId", projectId },  { "userId", userId }, { "task": { "Id", taskId }, { "Name", taskName }, { "JiraTaskId", JiraTaskId }, { "KindId", taskKindId }}}</code></td>
+</tr>
+<tr class="even">
+<td>event</td>
+<td>Project</td>
+<td>inserted</td>
+<td>When a project is created</td>
+<td><code> { { "accountId", accountId }, { "userId", userId }, { "project": { "Id", projectId }, { "Name", projectName }, { "TypeId", typeId },  { "Description", description }}}</code></td>
+</tr>
+<tr class="odd">
+<td>event</td>
+<td>Project</td>
+<td>updated</td>
+<td>When a project is updated</td>
+<td><code>{ { "accountId", accountId }, { "userId", userId }, { "project": { "Id", projectId }, { "Name", projectName }, { "TypeId", typeId },  { "Description", description }}}</code></td>
+</tr>
+<tr class="even">
+<td>event</td>
+<td>Purchase</td>
+<td>updated</td>
+<td>When a Purchase is update</td>
+<td><code> { { "accountId", accountId }, { "projectId", projectId }, { "userId", userId }, { "purchase", new JObject() { { "Id", purchaseId }, { "Name", purchaseName }, { "ActualAmount", actualAmount }, { "ProjectedAmount", projectedAmount } } } }</code></td>
+</tr>
+<tr class="odd">
+<td>event</td>
+<td>Revenue</td>
+<td>pre insert</td>
+<td>When a Revenue is going to be created</td>
+<td><code>{ { "ProjectedAmount", projectedAmount }, { "ActualAmount", actualAmount }, { "ProjectId", projectId } }</code></td>
+</tr>
+<tr class="even">
+<td>event</td>
+<td>Revenue</td>
+<td>inserted</td>
+<td>When a Revenue is created</td>
+<td><code>{ { "Id", revenueId }, { "Name", revenueName }, { "DueDate", dueDate }, { "ProjectedAmount", projectedAmount }, { "ActualAmount", actualAmount }, { "Status", statusId }, { "ProjectId", projectId }, { "UserId", UserId }, { "AccountId", AccountId } }</code></td>
+</tr>
+<tr class="odd">
+<td>event</td>
+<td>Revenue</td>
+<td>pre update</td>
+<td>When a Revenue is going to be updated</td>
+<td><code>{ { "ProjectedAmount", projectedAmount }, { "ActualAmount", actualAmount }, { "ProjectId", projectId } }</code></td>
+</tr>
+<tr class="even">
+<td>event</td>
+<td>Revenue</td>
+<td>updated</td>
+<td>When a Revenue is updated</td>
+<td><code>{ { "Id", revenueId }, { "Name", revenueName }, { "DueDate", dueDate }, { "ProjectedAmount", projectedAmount }, { "ActualAmount", actualAmount }, { "Status", statusId }, { "ProjectId", projectId }, { "UserId", UserId }, { "AccountId", AccountId } }</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="event-bubbling-up">Event bubbling up</h2>
+<p>Events don't bubble up how you may be used in other environments. But if an entity event affects others, such as its parents, these parents will also trigger an event.</p>
+<p>For example, you change the end date of a task. That will trigger the event <code>updated</code> on the entity <code>Task</code>. Now, consider these two scenarios:</p>
+<ul>
+<li>The task end date doesn't change the project's end date (or any other value, such as the cost). Then the project will not trigger any event</li>
+<li>The task end date pushes forward the project's end date. Then that will trigger the event <code>updated</code> on the entity <code>Project</code></li>
+</ul>
+<h1 id="template-syntax">Template Syntax</h1>
+<p>Wherever templates are supported, you can use curly braces to wrap an expression <code>{{ expression }}</code> to generate the text that you need.</p>
+<p>The template system is based on <a href="https://handlebarsjs.com/">Handlebars</a> and supports all the native <a href="https://handlebarsjs.com/guide/expressions.html#basic-usage">expressions</a>, plus a set of additional expressions that will come in handy when building an extension.</p>
+<!-- > caveat: Leave a space between curly craces and the expression {{ expression }} -->
+
+<blockquote>
+<p>caveat: If you need to include quotes within the template (tipically in the <code>payload</code>), you need to escape internal quotes with a backlash. <code>{{ "payload": "{\"Value\": 23 }}</code></p>
+</blockquote>
+<!-- Mustache, when given a JSON structure, will try to read it and get all the values without the keys, so it is better not to pass JSON to the Mustache template -->
+
+<h2 id="additional-expressions">Additional expressions</h2>
+<p>The following are Handlebars expressions created to specifically interact with the extension interpreter.</p>
+<h3 id="data-type-converters">Data type converters</h3>
+<p>Because the extension script is written in plain text, you will need to tell the interpreter what data type you intend to pass.</p>
+<ul>
+<li><p><code>date</code>: Transforms a string to a date type.</p>
+<ul>
+<li>Parameters: <code>input</code> <code>format</code></li>
+<li>Example: <code>"payload": "{\"jql\" : \"updated &gt;= '{{ date config.syncafterdate 'yyyy/MM/dd HH:mm' }} \" }"</code></li>
+</ul></li>
+<li><p><code>timespan</code> Transforms a string to a time type.</p>
+<ul>
+<li>Parameters: <code>input</code></li>
+<li>Example: <code>"payload": "{\"timetracking\": {\"originalEstimate\": {{ timespan taskdetails.list.0.Efforts.Estimated }}\" }"</code></li>
+</ul></li>
+<li><p><code>timespanFromSeconds</code> Transforms seconds to a time type</p>
+<ul>
+<li>Parameters: <code>input</code></li>
+<li>Example: <code>"payload": "{\"ReportedHours\": \"{{ timespanFromSeconds singleworklog.timeSpentSeconds 'hh\\:mm'}}\" }"</code></li>
+</ul></li>
+<li><p><code>int</code> Transforms a string to an integer.</p></li>
+</ul>
+<!-- cannot find any int example within extensions -->
+
+<h3 id="value-replacements">Value replacements</h3>
+<ul>
+<li><code>map</code> Replaces a mapped value with its equivalent, as defined in the <a href="#field-mapping">field mapping</a>
+<ul>
+<li>Parameters: <code>map reference</code> <code>input value</code></li>
+<li>Example: <code>"payload": "{\"TypeId\": {{ map config.mapping.projecttype.external singlejiraproject.projectCategory.id }},\" }"</code></li>
+</ul></li>
+<li><code>mapArray</code> Get mapping from the array passed in parameter.
+<ul>
+<li>Parameters: <code>map reference</code> <code>input value</code></li>
+<li>Example: <code>"payload": "{\"CustomField\": [{ \"CustomFieldBaseId\": {{ mapArray customfields 'Name' 'Jira Link' 'Id'}} }] }"</code></li>
+</ul></li>
+</ul>
+<!-- This is not clear -->
+
+<ul>
+<li><code>StringReplace</code> Replaces the second argument with the third argument in the first argument.</li>
+</ul>
+<!-- This is not clear. No examples in existing extensions -->
+
+<ul>
+<li><code>DoubleQuotesReplace</code> Encodes double Quotes(") with <code>&amp;quot;</code>.
+<ul>
+<li>Parameters: <code>input</code></li>
+<li>Example: <code>"payload": "{\"Name\": \"{{ DoubleQuotesReplace singlejiraissue.fields.summary }}\" }"</code></li>
+</ul></li>
+<li><code>json</code> Returns serialized object from json</li>
+</ul>
+<!-- This is not clear. No examples in existing extensions -->
+
+<h3 id="conditionals">Conditionals</h3>
+<ul>
+<li><p><code>ifempty</code> If the value given in the argument is empty then it executes the first statement otherwise second. "payload": "{"jql" : "project = {{ singlejiraproject.id }} AND updated &gt;= '{{#ifempty context.LastExecution }}{{ date config.syncafterdate 'yyyy/MM/dd HH:mm' }}{{else}}-{{ config.synchronizationfrequency }}m{{/ifempty}}'", "startAt" : 0, "maxResults" : 1000}",</p></li>
+<li><p><code>ifext</code> If the condition given in the argument is satisfied then it executes the first statement otherwise second.</p></li>
+</ul>
+<!-- This is not clear. No examples in existing extensions -->
+
+<ul>
+<li><code>ifNull</code> Executes the first statement if the value passed is null otherwise executes the second statement.</li>
+</ul>
+<!-- This is not clear. No examples in existing extensions -->
+
+<ul>
+<li><p><code>ifEquals</code> If 2 values given in the argument are matched then it executes the first statement otherwise second. "payload": "{"Name": "{{ singlejiraissue.fields.summary }}","Details": "{{ adfParserDescription singlejiraissue.fields.description }}","JiraURL": "{{ config.url }}","SynchronizationSource": "Jira","StartDate": "{{ date singlejiraissue.fields.created 'yyyy-MM-dd'}}","EndDate": {{#ifEquals singlejiraissue.fields.duedate '' }}"{{DateTime.Now "yyyy-MM-dd"}}"{{else}}"{{ date singlejiraissue.fields.duedate 'yyyy-MM-dd'}}"{{/ifEquals}},"TypeName": "{{ map config.mapping.issuetype.external singlejiraissue.fields.issuetype.id }}" ,"PriorityName": "{{ map config.mapping.issuepriority.external singlejiraissue.fields.priority.id }}"{{#ifEquals itmproject.list.0.MethodTypeId '2' }},"KanbanId":{{ kanbantaskstatus.KanbanId }}{{else}},"StatusName":"{{ map config.mapping.issuestatus.external singlejiraissue.fields.status.id }}"{{/ifEquals}} }",</p></li>
+<li><p><code>ifNotEquals</code> If 2 values given in the argument are not matched then it executes the first statement otherwise second.</p></li>
+</ul>
+<!-- No examples in existing extensions -->
+
+<!-- Internal  
+
+- `imagevariant` Inserts the third argument at the last index of the second argument in the first argument.
+This is not clear. No examples in existing extensions 
+- `adfParserDescription` Replaces Double Quotes(") in given argument with &quot; (Specially made for jira issue description)
+This is not clear. 
+                      "payload": "{\"Name\": \"{{ singlejiraissue.fields.summary }}\",\"Details\": \"{{ adfParserDescription singlejiraissue.fields.description }}\",\"JiraURL\": \"{{ config.url }}\",\"SynchronizationSource\": \"Jira\",\"StartDate\": \"{{ date singlejiraissue.fields.created 'yyyy-MM-dd'}}\",\"EndDate\": {{#ifEquals singlejiraissue.fields.duedate '' }}\"{{DateTime.Now \"yyyy-MM-dd\"}}\"{{else}}\"{{ date singlejiraissue.fields.duedate 'yyyy-MM-dd'}}\"{{/ifEquals}},\"TypeName\": \"{{ map config.mapping.issuetype.external singlejiraissue.fields.issuetype.id }}\" ,\"PriorityName\": \"{{ map config.mapping.issuepriority.external singlejiraissue.fields.priority.id }}\"{{#ifEquals itmproject.list.0.MethodTypeId '2' }},\"KanbanId\":{{ kanbantaskstatus.KanbanId }}{{else}},\"StatusName\":\"{{ map config.mapping.issuestatus.external singlejiraissue.fields.status.id }}\"{{/ifEquals}} }",
+ --> -->
+
+<h2 id="accessing-array-of-items">Accessing array of items</h2>
+<p>Mustache syntax won't work. To access the first item in a array, instead of something like <code>taskTeam.list.[0].Team</code>, it will have to be: <code>taskTeam.list.First.Team</code></p>
+<!-- wht? -->
+
+<h2 id="type-modifiers">Type modifiers</h2>
+<p>To compare or operate with values, you need to specify the type of value. <i class="far fa-code" title="Learn by example"></i> <strong>Learn by example</strong></p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&quot;condition&quot;</span><span class="fu">:</span> <span class="st">&quot;Convert.ToInt32(taskdetails.total) &gt; 0 &amp;&amp; Convert.ToInt32(taskdetails.list.0.KindId) == 3&quot;</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p><i class="fad fa-book-open" title="Guide"></i> <strong>Guide</strong></p>
+<p>To perform logical operations, you need to specify the type of value. The script interpreter will throw an error otherwise:</p>
+<p>There are the data converions you can use</p>
+<ul>
+<li><code>Convert.ToBoolean()</code>: Converts a specified value to an equivalent Boolean value.</li>
+<li><code>Convert.ToDateTime()</code>: Converts a specified value to a <a href="https://docs.microsoft.com/en-us/dotnet/api/system.datetime?view=net-6.0">DateTime</a> value.</li>
+<li><code>Convert.ToDecimal ()</code>: Converts a specified value to a decimal number.</li>
+<li><code>Convert.ToDouble()</code>: Converts a specified value to a double-precision floating-point number.</li>
+<li><code>Convert.ToInt16()</code>:Converts a specified value to a 16-bit signed integer.</li>
+<li><code>Convert.ToInt32()</code>:Converts a specified value to a 32-bit signed integer.</li>
+<li><code>Convert.ToInt64()</code>:Converts a specified value to a 64-bit signed integer.</li>
+<li><code>Convert.ToSingle()</code>: Converts a specified value to a single-precision floating-point number.</li>
+<li><code>Convert.ToString()</code>: Converts the specified value to its equivalent string representation.</li>
+</ul>
+<p><a name="variables"></a></p>
+<h1 id="script-variables">Script Variables</h1>
+<p><i class="far fa-code" title="Learn by example"></i> <strong>Learn by example</strong></p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;url&quot;</span><span class="fu">:</span> <span class="st">&quot;@@ITMAPI@@/my-company/projects/&quot;</span><span class="fu">,</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p><i class="fad fa-book-open" title="Guide"></i> <strong>Guide</strong></p>
+<p>The extension interpreter provides you with variables that you can use. In the example above, we used <code>@@ITMAPI@@</code> to call ITM Platform's login endpoint. The outcome of this case would be: <code>https://api.itmplatform.com/my-company/projects</code></p>
+<p><i class="fad fa-brackets" title="Reference"></i> <strong>Reference</strong></p>
+<ul>
+<li><code>@@AccountId@@</code> : The account Id, such as <code>18137</code></li>
+<li><code>@@AccountName@@</code> : The account name as it appears in the URL. For example <code>my-company</code></li>
+<li><code>@@LanguageId@@</code> : The user's language code, as follows: en: <code>1</code>, es: <code>2</code>, pt:<code>3</code></li>
+<li><code>@@ITMAPI@@</code> : The host part of the URL. <code>https://api.itmplatform.com/</code></li>
+</ul>
+<!-- - @@TaskMS@@
+- @@AccountMS@@ -->
+
+<h2 id="url">URL</h2>
+<p>Let's take the URL as an example.</p>
+<p><i class="far fa-code" title="Learn by example"></i> <strong>Learn by example</strong></p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&quot;url&quot;</span><span class="fu">:</span> <span class="st">&quot;@@ITMAPI@@/@@AccountName@@/login/{{ config.apikey }}&quot;</span><span class="fu">,</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p><i class="fad fa-book-open" title="Guide"></i> <strong>Guide</strong></p>
+<p>In the example above, we are using @@<a href="#variables">variables</a>@@ and {{ <a href="#template-syntax">template syntax</a> }} to call ITM Platform's login endpoint. The outcome in this case will be this: <code>https://api.itmplatform.com/my-company/login/86d4bb2a-2129-40f5-8311-918c6da16823</code></p>
+<h1 id="debugging">Debugging</h1>
+<p>To debug an extension, you need to look in the logs to know what happened during its execution. Because the script gets interpreted in ITM Platform's servers, there is no "run and debug" action as you may be used to in other languages.</p>
+<p>When an extension is triggered, either by the scheduler or an event, two different types of logs are fed.</p>
+<ul>
+<li>The "Event History" displays a registry of executions, their status and useful information for the end-user.</li>
+<li>The "Script logs" are available for developers, and they show a registry of all action results.</li>
+</ul>
+<h1 id="deploying-an-extension">Deploying an Extension</h1>
+<p>To create and deploy a script, you must have the proper license and permissions within ITM Platform.</p>
+<ol type="1">
+<li>From the Extension Panel, click on New Extension</li>
+<li>Fill out the name and other metadata. The extension name will be used internally as the unique identifier and cannot be changed. For example, 'my-extension'. It is case insensitive. No special characters or spaces are allowed</li>
+<li>Create the script in the "Code Editor" section</li>
+<li>Activate the extension from the Configuration section</li>
+</ol>
+<p><a name="multi-language"></a></p>
+<h1 id="multi-language">Multi-language</h1>
+<ul>
+<li>Some fields admit different language versions that will the displayed to the end-user depending on their language configuration. The three accepted languages are English (en), Spanish (es), Portuguese (pt). The default language is English.</li>
+</ul>
+<p><a name="terminology"></a></p>
+<h1 id="terminology">Terminology</h1>
+<ul>
+<li><strong>Extension:</strong> Apiece of code that adds a specific feature to ITM Platform</li>
+<li><strong>Connector:</strong> An extension that connects ITM Platform with other applications</li>
+<li><strong>Extension Script:</strong> Code that defines the behavior of the extension (represented within a JSON structure)</li>
+<li><strong>Extension Interpreter:</strong> The module within ITM Platform that executes the extension script</li>
+<li><strong>Entities:</strong> A singular object within ITM Platform. For example, a project or a task</li>
+<li><strong>System Events:</strong> Signals emitted upon changes within ITM Platform. For example, a task update.</li>
+<li><strong>Scheduler Events:</strong> Time-based system that specifies a moment in time. For example, every two hours.</li>
+<li><strong>Trigger:</strong> Any occurrence, such as a system event or a scheduler event.</li>
+<li><strong>Extension Features:</strong> Set of related actions that will be initiated upon a trigger.</li>
+<li><strong>Actions:</strong> Pieces of code executed to implement a feature, typically chained to one another.</li>
+</ul>
+<h1 id="examples-1">Examples</h1>
+<h2 id="obtaining-the-itm-platform-authentication-token">Obtaining the ITM Platform authentication token</h2>
+<div class="sourceCode" id="cb27"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span><span class="dt">&quot;actions&quot;</span><span class="fu">:</span><span class="ot">[</span><span class="fu">{</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;action&quot;</span><span class="fu">:</span> <span class="st">&quot;restcall&quot;</span><span class="fu">,</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;url&quot;</span><span class="fu">:</span> <span class="st">&quot;https://api.itmplatform.com/myCompany/login/{{ config.apikey }}&quot;</span><span class="fu">,</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;method&quot;</span><span class="fu">:</span> <span class="st">&quot;POST&quot;</span><span class="fu">,</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;description&quot;</span><span class="fu">:</span> <span class="st">&quot;Login with apikey&quot;</span><span class="fu">,</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;output&quot;</span><span class="fu">:</span> <span class="st">&quot;logininfo&quot;</span><span class="fu">,</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;payload&quot;</span><span class="fu">:</span> <span class="st">&quot;&quot;</span><span class="fu">,</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;dataType&quot;</span><span class="fu">:</span> <span class="st">&quot;application/json&quot;</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;action&quot;</span><span class="fu">:</span> <span class="st">&quot;restcall&quot;</span><span class="fu">,</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;url&quot;</span><span class="fu">:</span> <span class="st">&quot;https://api.itmplatform.com/myCompany/projects/22333&quot;</span><span class="fu">,</span></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;method&quot;</span><span class="fu">:</span> <span class="st">&quot;GET&quot;</span><span class="fu">,</span></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;token&quot;</span><span class="fu">:</span> <span class="st">&quot;{{ logininfo.Token }}&quot;</span><span class="fu">,</span></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;description&quot;</span><span class="fu">:</span> <span class="st">&quot;Retrieve project&quot;</span><span class="fu">,</span></span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;output&quot;</span><span class="fu">:</span> <span class="st">&quot;project&quot;</span><span class="fu">,</span></span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;payload&quot;</span><span class="fu">:</span> <span class="st">&quot;&quot;</span><span class="fu">,</span></span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;dataType&quot;</span><span class="fu">:</span> <span class="st">&quot;application/json&quot;</span></span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span><span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
+<p>Result object in the <code>logininfo</code> variable (<code>output</code> of the first action):</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;Token&quot;</span><span class="fu">:</span> <span class="st">&quot;5955520211116162058986&quot;</span><span class="fu">,</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;UserID&quot;</span><span class="fu">:</span> <span class="st">&quot;33989&quot;</span><span class="fu">,</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;AccountID&quot;</span><span class="fu">:</span> <span class="st">&quot;18137&quot;</span><span class="fu">,</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;Result&quot;</span><span class="fu">:</span> <span class="st">&quot;1&quot;</span><span class="fu">,</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;ResultStatus&quot;</span><span class="fu">:</span> <span class="st">&quot;Success&quot;</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+</body>
+</html>
