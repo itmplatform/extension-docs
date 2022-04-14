@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>ITM Platform's Plugin Script Documentation</title>
+  <title>Custom Extensions Documentation</title>
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -83,9 +83,6 @@
   <![endif]-->
 </head>
 <body>
-<header id="title-block-header">
-<h1 class="title">ITM Platform's Plugin Script Documentation</h1>
-</header>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#overview">Overview</a>
@@ -140,6 +137,12 @@
 </ul></li>
 </ul>
 </nav>
+<div style="text-align: center">
+<img src="./extensions-mark-title-framed-blue-bckg.svg" width="300">
+</div>
+
+<!-- *** HTML version *** -->
+
 <!-- Uncomment the line below before converting this file to HTML -->
 
 <script src="https://kit.fontawesome.com/81ab11011e.js" crossorigin="anonymous"></script>
@@ -147,6 +150,8 @@
 <!-- Comment the line below before converting this file to HTML-->
 
 <!-- <a href="https://developers.itmplatform.com/extension-docs/" target> HTML version of this document.</a> -->
+
+<!-- *** HTML version *** -->
 
 <h1 id="overview">Overview</h1>
 <p>Extensions add a specific feature to ITM Platform. They can be used to extend functionality or as a connector between ITM Platform and a third-party system.</p>
@@ -160,10 +165,6 @@
 <li>You can create and edit your own extensions in the "code editor" section, which will give you access to the extension script. Notice that you can't edit global extensions.</li>
 <li>A extension script is a JSON file that follows a structure of instructions that will perform the functionality you need.</li>
 <li>A extension can be triggered based on time (scheduler) or specific ITM Platform events. For example, every day or when a purchase is updated.</li>
-</ul>
-<!-- every day at 8 am: Verify we explain how to use the scheduler, I'm not clear on this -->
-
-<ul>
 <li>Once triggered, the extension will initiate actions that can be chained to one another, forming a sequence of actions called features.</li>
 <li>Once a extension is ready, you can activate it.</li>
 </ul>

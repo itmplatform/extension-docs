@@ -4,7 +4,7 @@ You can create an HTML version of the main documents. To do so,
 1. Convert the MD file into HTML using [pandoc](https://pandoc.org/), like so:
 
     ```console
-    pandoc --toc --metadata title="ITM Platform's Plugin Script Documentation" --standalone --from gfm --to html5 --css style.css ../readme.md -o index.html 
+    pandoc --toc --metadata pagetitle="Custom Extensions Documentation" --standalone --from gfm --to html5 --css style.css ../readme.md -o index.html 
     ```
 1. Comment back the script line in readme.md to avoid showing it on gitHub.
 
