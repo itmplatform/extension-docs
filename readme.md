@@ -60,19 +60,19 @@ A extension script is defined in a single JSON file, following this structure:
 ## Examples
 All these examples include the code and a tutorial. It is recommended to start with the first and go into more complex examples as you understand the simpler ones.
 
-- [Example 1](https://github.com/itmplatform/extension-documentation/tree/main/example-1). When a project updates, send a message to a static email address.
+- [Example 1](https://github.com/itmplatform/extension-docs/tree/main/example-1). When a project updates, send a message to a static email address.
     - Event-based
     - Minimal configuration: activation only
-- [Example 2](https://github.com/itmplatform/extension-documentation/tree/main/example-2).	When a purchase's actual value updates, send an email to a static address if the amount exceeds the purchase budget.
+- [Example 2](https://github.com/itmplatform/extension-docs/tree/main/example-2).	When a purchase's actual value updates, send an email to a static address if the amount exceeds the purchase budget.
     - Event-based
     - Using conditions
-- [Example 3](https://github.com/itmplatform/extension-documentation/tree/main/example-3).	Send a daily email to the project manager of a specific project containing all tasks whose end date is later than today.
+- [Example 3](https://github.com/itmplatform/extension-docs/tree/main/example-3).	Send a daily email to the project manager of a specific project containing all tasks whose end date is later than today.
     - Scheduler-based
     - Loop and conditions
-- [Example 4](https://github.com/itmplatform/extension-documentation/tree/main/example-4). Synchronize ITM Platform's clients with Hubspot's companies: only those having the Hubspot's property `sync_itm_platform` set to `true`.
+- [Example 4](https://github.com/itmplatform/extension-docs/tree/main/example-4). Synchronize ITM Platform's clients with Hubspot's companies: only those having the Hubspot's property `sync_itm_platform` set to `true`.
     - Scheduler-based
     - Connector to a third-party system
-- [Example 5](https://github.com/itmplatform/extension-documentation/tree/main/example-5). Allow users to input revenue's Actual Amount if <= Projected Amount. 
+- [Example 5](https://github.com/itmplatform/extension-docs/tree/main/example-5). Allow users to input revenue's Actual Amount if <= Projected Amount. 
     - Event-based, synchronous
 
 ## Extension General Definition
