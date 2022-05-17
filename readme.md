@@ -258,8 +258,8 @@ Performs a <a href="https://en.wikipedia.org/wiki/SOAP" target="_blank">SOAP cal
     "payload": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\"><soapenv:Header/><soapenv:Body><tem:CallPost><tem:name>{{ input.SomeInt }}</tem:name></tem:CallPost></soapenv:Body></soapenv:Envelope>",
     "dataType":  "application/json",
     "authentication": "basic",
-    "user": "testuser",
-    "pass": "testpass",
+    "username": "testuser",
+    "password": "testpass",
     "output": "jsonoutput"
 }
 ```
@@ -716,8 +716,8 @@ As an extension developer, you don't set those relationships. You give the user 
                 "method": "GET",
                 "url": "@@url@@/rest/api/3/project/type",
                 "authentication": "Basic",
-                "user": "@@user@@",
-                "pass": "@@pass@@",
+                "username": "@@user@@",
+                "password": "@@pass@@",
                 "id": "key",
                 "name": "formattedKey",
                 "columnName": {
