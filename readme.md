@@ -772,16 +772,16 @@ The following are the events that ITM Platform triggers.
 |Trigger|Entity|Action|When|Input|
 |---|---|---|---|---|
 |scheduler|||This executes from scheduler|context.LastExecution|
-|event|Task|inserted|When a task is inserted| ``` { { "accountId", accountId }, { "projectId", projectId },  { "userId", userId }, { "task": { "Id", taskId }, { "Name", taskName }, { "JiraTaskId", JiraTaskId }, { "KindId", taskKindId }}} ```|
-|event|Task|updated|When a task is updated|``` { { "accountId", accountId }, { "projectId", projectId },  { "userId", userId }, { "task": { "Id", taskId }, { "Name", taskName }, { "JiraTaskId", JiraTaskId }, { "KindId", taskKindId }}}``` |
-|event|Project|inserted|When a project is created| ``` { { "accountId", accountId }, { "userId", userId }, { "project": { "Id", projectId }, { "Name", projectName }, { "TypeId", typeId },  { "Description", description }}}```|
-|event|Project|updated|When a project is updated| ``` { { "accountId", accountId }, { "userId", userId }, { "project": { "Id", projectId }, { "Name", projectName }, { "TypeId", typeId },  { "Description", description }}} ```|
-|event|Purchase|inserted|When a Purchase is created| ``` { { "accountId", accountId }, { "projectId", projectId }, { "userId", userId }, { "purchase", new JObject() { { "Id", purchaseId }, { "Name", purchaseName }, { "ActualAmount", actualAmount }, { "ProjectedAmount", projectedAmount } } } }```|
-|event|Purchase|updated|When a Purchase is updated| ``` { { "accountId", accountId }, { "projectId", projectId }, { "userId", userId }, { "purchase", new JObject() { { "Id", purchaseId }, { "Name", purchaseName }, { "ActualAmount", actualAmount }, { "ProjectedAmount", projectedAmount } } } }```|
-|event|Revenue|pre insert|When a Revenue is going to be created| ``` { { "ProjectedAmount", projectedAmount }, { "ActualAmount", actualAmount }, { "ProjectId", projectId } } ```|
-|event|Revenue|inserted|When a Revenue is created| ``` { { "Id", revenueId }, { "Name", revenueName }, { "DueDate", dueDate }, { "ProjectedAmount", projectedAmount }, { "ActualAmount", actualAmount }, { "Status", statusId }, { "ProjectId", projectId }, { "UserId", UserId }, { "AccountId", AccountId } } ```|
-|event|Revenue|pre update|When a Revenue is going to be updated| ``` { { "ProjectedAmount", projectedAmount }, { "ActualAmount", actualAmount }, { "ProjectId", projectId } } ```|
-|event|Revenue|updated|When a Revenue is updated| ``` { { "Id", revenueId }, { "Name", revenueName }, { "DueDate", dueDate }, { "ProjectedAmount", projectedAmount }, { "ActualAmount", actualAmount }, { "Status", statusId }, { "ProjectId", projectId }, { "UserId", UserId }, { "AccountId", AccountId } } ```|
+|event|Task|inserted|When a task is inserted| ``` { "accountId": "accountId", "projectId": "projectId", "userId": "userId", "task": { "Id": "taskId", "Name": "taskName", "JiraTaskId": "JiraTaskId", "KindId": "taskKindId" } } ```|
+|event|Task|updated|When a task is updated|``` { "accountId": "accountId", "projectId": "projectId", "userId": "userId", "task": { "Id": "taskId", "Name": "taskName", "JiraTaskId": "JiraTaskId", "KindId": "taskKindId" }}``` |
+|event|Project|inserted|When a project is created| ``` { "accountId": "accountId", "userId": "userId", "project": { "Id": "projectId", "Name": "projectName", "TypeId": "typeId", "Description": "description" }}```|
+|event|Project|updated|When a project is updated| ``` { "accountId": "accountId", "userId": "userId", "project": { "Id": "projectId", "Name": "projectName", "TypeId": "typeId", "Description": "description" }} ```|
+|event|Purchase|inserted|When a Purchase is created| ``` { "accountId": "accountId", "projectId": "projectId", "userId": "userId", "purchase": { "Id": purchaseId, "Name": "purchaseName", "ActualAmount": "actualAmount", "ProjectedAmount": "projectedAmount", "StatusId": "statusId" } }```|
+|event|Purchase|updated|When a Purchase is updated| ``` { "accountId": "accountId", "projectId": "projectId", "userId": "userId", "purchase": { "Id": purchaseId, "Name": "purchaseName", "ActualAmount": "actualAmount", "ProjectedAmount": projectedAmount", "StatusId": "statusId" } }```|
+|event|Revenue|pre insert|When a Revenue is going to be created| ``` { "ProjectedAmount": "projectedAmount", "ActualAmount": "actualAmount", "ProjectId": "projectId" } ```|
+|event|Revenue|inserted|When a Revenue is created| ``` { "Id": "revenueId", "Name": "revenueName", "DueDate": "dueDate", "ProjectedAmount": "projectedAmount", "ActualAmount": "actualAmount", "Status": "statusId", "ProjectId": "projectId" , "UserId": "UserId", "AccountId": "AccountId" } ```|
+|event|Revenue|pre update|When a Revenue is going to be updated| ``` { "ProjectedAmount": "projectedAmount", "ActualAmount": "actualAmount", "ProjectId": "projectId" } ```|
+|event|Revenue|updated|When a Revenue is updated| ``` { "Id": "revenueId", "Name": "revenueName", "DueDate": "dueDate", "ProjectedAmount": "projectedAmount", "ActualAmount": "actualAmount", "Status": "statusId", "ProjectId": "projectId" , "UserId": "UserId", "AccountId": "AccountId" } ```|
 
 
 ## Event bubbling up
