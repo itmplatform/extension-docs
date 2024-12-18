@@ -5,7 +5,7 @@ The extension will synchronize ticketing system tickets with ITM Platform tasks.
 - **Agent** or **ticket assignee** is the equivalent to ITM Platform **user** (typically a developer)
 ### Extension MVP
  The MVP idea is to have ITM Platform synchronized so that when a ticket is assigned to an agent in Ticketing, it will create or update a task in a specific project in ITM Platform, and assign it to a user.  When the task status is updated in ITM Platform[^10], it will update the Ticketing ticket.
- Therefore it will have two triggers: `webhook` for Zendesk> ITM Platform and `event` for ITM Platform > Zendesk.
+ Therefore it will have two triggers: `webhook` for *Zendesk> ITM Platform* and `event` for *ITM Platform > Zendesk*.
  
 ### General specs
  
@@ -25,12 +25,14 @@ All fields are mandatory unless otherwise indicated.
 - ITM Platform to Zendesk (task `updated` event)
 	- Zendesk required fields, such as URL, authentication (see `type: header` in the [Extension Configuration](https://github.com/itmplatform/extension-docs?tab=readme-ov-file#extension-configuration)) 
 	- `front-desk-support-email` 
+
+Zendesk extension configuration example:
 ```
 +----------------------------------------------------+
 |                  EXTENSION CONFIG                  |
 +----------------------------------------------------+
 | Zendesk -> ITM Configuration:                      |
-|   + Project Id: [REQUIRED: numeric or GUID]        |
+|   + Project Id: [REQUIRED: numeric]        |
 |   + initial_status_id: [REQUIRED: numeric]         |
 |   + ready_to_reply_status_id: [REQUIRED: numeric]  |
 |                                                    |
@@ -57,8 +59,8 @@ All fields are mandatory unless otherwise indicated.
 		* Name (overwrite existing to ensure match if changed in ITM Platform)
 		* Description (see how[^6]), 
 		* Status: 
-			* If the ticket assignee is not  `front-desk-support-email` set the status to `initial`
-		* `TicketURL`
+			* If the ticket assignee is not `front-desk-support-email` (therefore is an agent/developer) set the status to `initial`
+		* `TicketURL` build from the ticket Id and the ticketing system URL
 		* If the ticket assignee is not  `front-desk-support-email`, assign the agent to the task team if it wasn't already[^8]
 ```
         +-----------------------+
@@ -75,7 +77,7 @@ All fields are mandatory unless otherwise indicated.
        |  (Ticket->ITM Platform)  |
        +------------+-------------+
                     | Validate inputs (agent, project, fields)
-                    | Check if task with TicketURL exists
+                    | Check if a task with TicketURL exists
                     |   - NO: create new task with 'initial' status
                     |   - YES: update existing task (name, desc, status)
                     | If agent ≠ front-desk-support-email, 
@@ -146,6 +148,6 @@ Notes:
 
 [^10] Basic MVP. This should quickly include task Progress Reports, as they will be added as an internal note in Ticketing, which would 
 
-[^11]: The project task status `ids` should later on come from a dropdown, ideally filtered by project.
+[^11]: The project task status `ids` should later on come from a dropdown, ideally filtered by project. For a user is impossible to know the status `id`.
 
 [^12]: Zendesk: Supports direct assignment of tickets using the` assignee_email` field. Help Scout: Requires retrieving the agent's user ID via the List Users API before assigning a conversation.
