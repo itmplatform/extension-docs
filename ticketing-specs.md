@@ -78,8 +78,8 @@ Zendesk extension configuration example:
        +------------+-------------+
                     | Validate inputs (agent, project, fields)
                     | Check if a task with TicketURL exists
-                    |   - NO: create new task with 'initial' status
-                    |   - YES: update existing task (name, desc, status)
+                    |   - NO: create new task with 'name', 'TickertURL',  , set 'initial' status
+                    |   - ALWAYS: update existing task (name, desc, status)
                     | If agent ≠ front-desk-support-email, 
                     | ensure agent is assigned to task team
                     v
