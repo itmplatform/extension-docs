@@ -146,7 +146,7 @@ Notes:
 
 [^9]: Probably we should use `pre update` and `pre insert` and verify the current state and the new one OR include in the `input` of the event what properties have changed.
 
-[^10] Basic MVP. This should quickly include task Progress Reports, as they will be added as an internal note in Ticketing, which would 
+[^10]: Basic MVP. This should quickly include task Progress Reports, as they will be added as an internal note in Ticketing, which would 
 
 [^11]: The project task status `ids` should later on come from a dropdown, ideally filtered by project. For a user is impossible to know the status `id`.
 
