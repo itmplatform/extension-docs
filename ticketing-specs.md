@@ -126,6 +126,30 @@ Zendesk extension configuration example:
 Notes:
 * I'm not sure whether [Field Mapping](https://github.com/itmplatform/extension-docs?tab=readme-ov-file#field-mapping) needs to be used somewhere
 
+## Task update event changes
+To assess whether the task status has changed, we need to modify the extension interpreter so that the task's `updated` event payload includes the changes. To do so, we will include a `diff` property in the payload/input that will contain all properties that have changed. For example:
+```json
+{
+    "accountId": "accountId",
+    "projectId": "projectId",
+    "task": {
+        "Id": "taskId",
+        "JiraTaskId": "JiraTaskId",
+        "KindId": "taskKindId",
+        "Name": "taskName"
+    },
+    "userId": "userId",
+	"diff": {
+		"StatusName":{"old": "To Verify", "new": "Done"},
+		"EndDate": {"old": "2017-04-20", "new": "2017-04-21" },
+		"StartDate":{"old": "2017-02-14", "new": "2017-02-15"}
+	}
+}
+```
+As an additional feature we can exclude properties when the `old` and `new` values are the same (in case the user called the API overwriting the same values).
+
+## Footnotes
+
 [^0]: Because waterfall task status are general, and activities too plus which services are v1. This also limits only one extension per client (one Zendesk account, one ITM Platform account) 
 
 [^1]: To prevent all projects having tasks with that custom field, the project should be of a specific type (e.g., `Ticketing`). We currently don't have a way to assign custom fields to specific projects. We also don't have a way to make it read-only.
@@ -144,7 +168,7 @@ Notes:
 
 [^8]: To do things well, when a ticket changes agents, we should remove the old one. But since we admit multiple task members, for now, we can leave it as is.
 
-[^9]: Probably we should use `pre update` and `pre insert` and verify the current state and the new one OR include in the `input` of the event what properties have changed.
+[^9]: See [Task update event changes](#task-update-event-changes) to determine if the status changed to the desired status `ready-to-reply`.
 
 [^10]: Basic MVP. This should quickly include task Progress Reports, as they will be added as an internal note in Ticketing, which would 
 
