@@ -66,6 +66,36 @@
           "authentication": "basic",
           "username": "{{ config.email }}/token",
           "password": "{{ config.token }}"
+        },
+        {
+          "action": "restcall",
+          "url": "@@TaskMS@@/v2/{{ input.accountId }}/Projects/{{ input.projectId }}/Tasks/Search",
+          "method": "POST",
+          "description": "Check if task exists before",
+          "output": "taskOutput",
+          "condition": "input.ticket.ticketAssigneeEmail != null && input.ticket.ticketAssigneeEmail == config.front_desk_support_email",
+          "payload": "{\"columns\":{\"$in\":[\"AllCustomFields\"]}}",
+          "dataType": "application/json"
+        },
+        {
+          "action": "restcall",
+          "url": "@@TaskMS@@/v2/{{ input.accountId }}/Projects/{{ input.projectId }}/Tasks/{{ input.ticket.ticketURL }}",
+          "method": "PATCH",
+          "description": "Update Existing Task",
+          "output": "taskOutput",
+          "condition": "taskOutput.total > 0 && taskOutput.list.AllCustomFields != null && taskOutput.list.AllCustomFields.TicketURL != null && taskOutput.list.AllCustomFields.TicketURL == input.ticket.ticketURL",
+          "payload": "{\"Name\":\"{{input.ticket.name}}\",\"StatusName\":\"{{ map config.mapping.taskstatus.external input.ticket.status }}\",\"Details\":\"input.ticket.description\"}",
+          "dataType": "application/json"
+        },
+        {
+          "action": "restcall",
+          "url": "@@TaskMS@@/v2/{{ input.accountId }}/Projects/{{ input.projectId }}/Tasks",
+          "method": "POST",
+          "description": "Create New Task",
+          "output": "taskOutput",
+          "condition": "taskOutput.total == 0 ||  taskOutput.list.AllCustomFields == null || && taskOutput.list.AllCustomFields.TicketURL == null || taskOutput.list.AllCustomFields.TicketURL != input.ticket.ticketURL",
+          "payload": "{\"Name\":\"{{input.ticket.name}}\",\"StatusName\":\"{{ map config.mapping.taskstatus.external input.ticket.status }}\",\"TypeName\":\"Generic\",\"PriorityName\":\"Normal\",\"CustomField\":[{\"CustomFieldBaseId\":8027,\"CustomFieldValue\":\"27\",\"CustomFieldTypeName\":\"Text\"}],\"StartDate\":\"2024-11-20\",\"EndDate\":\"2025-01-24\",\"KindId\":3}",
+          "dataType": "application/json"
         }
       ]
     }
@@ -145,6 +175,115 @@
       },
       "type": "string",
       "required": true
+    },
+
+    {
+      "name": "project_id",
+      "label": {
+        "en": "Project Id",
+        "es": "Project Id",
+        "pt": "Project Id"
+      },
+      "tooltip": {
+        "en": "Project Id",
+        "es": "Project Id",
+        "pt": "Project Id"
+      },
+      "type": "int",
+      "required": true
+    },
+
+    {
+      "name": "initial_status_id",
+      "label": {
+        "en": "Intial Status Id",
+        "es": "Intial Status Id",
+        "pt": "Intial Status Id"
+      },
+      "type": "int",
+      "required": true
+    },
+    {
+      "name": "ready_to_reply_status_id",
+      "label": {
+        "en": "Ready To Reply Status Id",
+        "es": "Ready To Reply Status Id",
+        "pt": "Ready To Reply Status Id"
+      },
+      "type": "int",
+      "required": true
+    }
+  ],
+  "mapping": [
+    {
+      "name": "projecttype",
+      "label": {
+        "en": "Project Type",
+        "es": "Tipo de proyecto",
+        "pt": "Tipo de Projeto"
+      },
+      "external": {
+        "isFromITM": false,
+        "method": "GET",
+        "url": "@@url@@/rest/api/3/project/type",
+        "authentication": "Basic",
+        "user": "@@user@@",
+        "pass": "@@pass@@",
+        "id": "key",
+        "name": "formattedKey",
+        "columnName": {
+          "en": "Zendesk",
+          "es": "Zendesk",
+          "pt": "Zendesk"
+        }
+      },
+      "internal": {
+        "isFromITM": true,
+        "method": "GET",
+        "url": "v2/@@companyId@@/GetProjectTypes",
+        "id": "Id",
+        "name": "Name",
+        "columnName": {
+          "en": "ITM",
+          "es": "ITM",
+          "pt": "ITM"
+        }
+      }
+    },
+    {
+      "name": "taskstatus",
+      "label": {
+        "en": "Issue Status",
+        "es": "Estado de issue",
+        "pt": "Estado da issue"
+      },
+      "external": {
+        "isFromITM": false,
+        "method": "GET",
+        "url": "@@url@@/rest/api/3/status",
+        "authentication": "Basic",
+        "user": "@@user@@",
+        "pass": "@@pass@@",
+        "id": "id",
+        "name": "name",
+        "columnName": {
+          "en": "Zendesk",
+          "es": "Zendesk",
+          "pt": "Zendesk"
+        }
+      },
+      "internal": {
+        "isFromITM": true,
+        "method": "GET",
+        "url": "v2/@@companyId@@/Projects/@@project_id@@/GetKanbanTaskStatus",
+        "id": "Id",
+        "name": "Name",
+        "columnName": {
+          "en": "ITM",
+          "es": "ITM",
+          "pt": "ITM"
+        }
+      }
     }
   ],
   "updated": "02-01-2024",
