@@ -29,7 +29,7 @@
       "AccountId": "@@AccountId@@",
       "entity": "Task",
       "description": "Task update Event, which will update 'Ticket' in Zendesk",
-      "condition": "input.diff.StatusName != null && Convert.ToString(input.diff.StatusName.new) == \"Done\"",
+      "condition": "input.diff != null && input.diff.StatusName != null && input.diff.StatusName.new != null && Convert.ToString(input.diff.StatusName.new) == \"Done\"",
       "event": "updated",
       "async": true,
       "actions": [
@@ -66,7 +66,19 @@
           "authentication": "basic",
           "username": "{{ config.email }}/token",
           "password": "{{ config.token }}"
-        },
+        }
+      ]
+    },
+    {
+      "trigger": "webhook",
+      "connector": "itm-zendesk",
+      "AccountId": "@@AccountId@@",
+      "entity": "Task",
+      "description": "Task update Event, which will update 'Ticket' in Zendesk",
+      "condition": "input.diff.StatusName != null && Convert.ToString(input.diff.StatusName.new) == \"Done\"",
+      "event": "updated",
+      "async": true,
+      "actions": [
         {
           "action": "restcall",
           "url": "@@TaskMS@@/v2/{{ input.accountId }}/Projects/{{ input.projectId }}/Tasks/Search",
@@ -286,6 +298,6 @@
       }
     }
   ],
-  "updated": "02-01-2024",
+  "updated": "09-01-2024",
   "AccountId": "18137"
 }
