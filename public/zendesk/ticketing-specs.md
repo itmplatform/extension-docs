@@ -90,7 +90,7 @@ Zendesk extension configuration example:
 
 ```
 ### ITM Platform >> Ticketing (task event)
-* `Updated` or `inserted` event is triggered for a task[^9]
+* `Updated` event is triggered for a task[^9]
 * If the task doesn't have a filled-in `TicketURL` custom filed, it will stop, no logging or errors to avoid log clogging.
 * The code should only run if the status has changed[^9] to the `ready-to-reply` status[^10]
 * The ticket must change the assigned agent to `front-desk-support-email` [^12]
@@ -102,7 +102,7 @@ Zendesk extension configuration example:
        +------------+-------------+
                     |
             Trigger on task change event
-             (e.g. 'updated', 'inserted')
+             ('updated')
                     |
              If status changed to 
               'ready-to-reply' and 
@@ -122,9 +122,6 @@ Zendesk extension configuration example:
        +---------------------------+
 
 ```
-
-Notes:
-* I'm not sure whether [Field Mapping](https://github.com/itmplatform/extension-docs?tab=readme-ov-file#field-mapping) needs to be used somewhere
 
 ## Task update event changes
 To assess whether the task status has changed, we need to modify the extension interpreter so that the task's `updated` event payload includes the changes. To do so, we will include a `diff` property in the payload/input that will contain all properties that have changed. For example:
