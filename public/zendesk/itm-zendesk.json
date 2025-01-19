@@ -26,7 +26,7 @@
       "AccountId": "@@AccountId@@",
       "entity": "Task",
       "description": "Task update Event, which will update 'Ticket' in Zendesk",
-      "condition": "input.diff != null && input.diff.StatusId != null && input.diff.StatusId.new != null && input.diff.StatusId.new == {{config.ready_to_reply_status_id}}",
+      "condition": "input.diff != null && input.diff.StatusId != null && input.diff.StatusId.new != null && Convert.ToInt32(input.diff.StatusId.new) == Convert.ToInt32(config.ready_to_reply_status_id) && Convert.ToInt32(input.userId) != -99",
       "event": "updated",
       "async": true,
       "actions": [
@@ -59,7 +59,7 @@
           "method": "PATCH",
           "description": "Update Zendesk Ticket",
           "output": "zendeskResponse",
-          "condition": "Convert.ToInt32(frontDeskSupportUsersOutput.count) > 0 && customfields.AllCustomFields != null && Convert.ToString(customfields.AllCustomFields.TicketURL) != null",
+          "condition": "frontDeskSupportUsersOutput != null Convert.ToInt32(frontDeskSupportUsersOutput.count) > 0 && customfields.AllCustomFields != null && Convert.ToString(customfields.AllCustomFields.TicketURL) != null",
           "payload": "{\"ticket\":{\"assignee_id\":\"{{ frontDeskSupportUsersOutput.users.0.id }}\",\"comment\":{\"body\":\"Ticket reassigned back to Front Desk Support.\",\"public\":false}}}",
           "dataType": "application/json",
           "authentication": "basic",
@@ -74,38 +74,53 @@
       "AccountId": "@@AccountId@@",
       "entity": "Task",
       "description": "Create or Update Task in ITM from Zendesk",
-      "condition": "input.ticket != null && input.ticket.id != 0",
+      "condition": "input.ticket != null && Convert.ToInt32(input.ticket.id) != 0",
       "event": "updated",
       "async": true,
       "actions": [
         {
           "action": "restcall",
-          "url": "@@TaskMS@@/v2/{{ input.accountId }}/Projects/{{ config.projectId }}/Tasks/Search",
+          "url": "@@TaskMS@@/v2/{{ input.accountId }}/Projects/Search",
           "method": "POST",
-          "description": "Check if task exists before",
-          "output": "taskOutput",
-          "condition": "input.ticket != null && input.ticket.id != 0 && input.ticket.ticketAssigneeEmail != null && input.ticket.ticketAssigneeEmail == config.front_desk_support_email",
-          "payload": "{\"columns\":{\"$in\":[\"AllCustomFields\",\"Id\"]}}",
+          "condition": "input.ticket != null && Convert.ToInt32(input.ticket.id) != 0 && Convert.ToString(input.ticket.ticketAssigneeEmail) != \"\"",
+          "description": "Getting Project Team Members",
+          "output": "teamMembers",
+          "payload": "{\"columns\":{\"$in\":[\"Team.TeamMembers\",\"Team.Managers\"]},\"Filter\":{\"id\":{{  config.projectId }},\"Team.TeamMembers.EmailAddress\":\"{{ input.ticket.ticketAssigneeEmail }}\"}}",
+          "dataType": "application/json"
+        },
+        {
+          "action": "validate",
+          "validateCondition": "input.ticket != null && Convert.ToInt32(input.ticket.id) != 0 && Convert.ToString(input.ticket.ticketAssigneeEmail) != \"\" && Convert.ToString(input.ticket.ticketAssigneeEmail) != Convert.ToString(config.front_desk_support_email) && Convert.ToInt32(teamMembers.total) == 0",
+          "message": "The ticket assignee must be a member of the project team or the front-desk support email. Please update the assignee before proceeding."
+        },
+        {
+          "action": "restcall",
+          "url": "@@TaskMS@@/v2/{{ input.accountId }}/tasks/CustomFields",
+          "method": "GET",
+          "description": "Get Project Task Custom Fields",
+          "output": "AllCustomFieldsOutput",
+          "condition": "input.ticket != null && Convert.ToInt32(input.ticket.id) != 0 && Convert.ToString(input.ticket.ticketAssigneeEmail) != \"\"",
+          "payload": "",
           "dataType": "application/json"
         },
         {
           "action": "restcall",
-          "url": "@@TaskMS@@/v2/{{ input.accountId }}/Projects/{{ config.projectId }}/Tasks/{{ taskOutput.list.0.Id }}",
+          "url": "@@TaskMS@@/v2/{{ input.accountId }}/Projects/{{ config.projectId }}/Tasks/{{ input.ticket.ITMTaskId }}?UserId=-99&LanguageId=@@LanguageId@@",
           "method": "PATCH",
           "description": "Update Existing Task",
           "output": "taskOutput",
-          "condition": "taskOutput != null && taskOutput.total > 0 && taskOutput.list.0.AllCustomFields != null && taskOutput.list.0.AllCustomFields.TicketURL != null && taskOutput.list.0.AllCustomFields.TicketURL == input.ticket.ticketURL",
-          "payload": "{\"Name\":\"{{input.ticket.name}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"Details\":\"input.ticket.description\"}",
+          "condition": "input.ticket != null && Convert.ToInt32(input.ticket.id) != 0 && Convert.ToString(input.ticket.ticketAssigneeEmail) != \"\" && input.ticket.ITMTaskId != null && Convert.ToString(input.ticket.ITMTaskId) != \"\"",
+          "payload": "{\"Name\":\"{{input.ticket.name}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"Details\":\"{{ input.ticket.description }}\",\"TaskMembers\":\"{{ input.ticket.ticketAssigneeEmail }}\"}",
           "dataType": "application/json"
         },
         {
           "action": "restcall",
-          "url": "@@TaskMS@@/v2/{{ input.accountId }}/Projects/{{ config.projectId }}/Tasks",
+          "url": "@@TaskMS@@/v2/{{ input.accountId }}/Projects/{{ config.projectId }}/Tasks?UserId=-99&LanguageId=@@LanguageId@@",
           "method": "POST",
           "description": "Create New Task",
           "output": "taskOutput",
-          "condition": "taskOutput.total == 0 ||  taskOutput.list.0.AllCustomFields == null || && taskOutput.list.0.AllCustomFields.TicketURL == null || taskOutput.list.0.AllCustomFields.TicketURL != input.ticket.ticketURL",
-          "payload": "{\"Name\":\"{{input.ticket.name}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"TypeName\":\"Generic\",\"PriorityName\":\"Normal\",\"CustomField\":[{\"CustomFieldBaseId\":8027,\"CustomFieldValue\":\"{{ input.ticket.ticketURL }}\",\"CustomFieldTypeName\":\"Text\"}],\"KindId\":3}",
+          "condition": "input.ticket != null && Convert.ToInt32(input.ticket.id) != 0 && Convert.ToString(input.ticket.ticketAssigneeEmail) != \"\" && (input.ticket.ITMTaskId == null || Convert.ToString(input.ticket.ITMTaskId) == \"\")",
+          "payload": "{\"Name\":\"{{input.ticket.name}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"TaskMembers\":\"{{ input.ticket.ticketAssigneeEmail }}\",\"TypeName\":\"Generic\",\"PriorityName\":\"Normal\",\"CustomField\":[ {{#ifEquals AllCustomFieldsOutput.Name 'TicketURL'}}  {{else}} {\"CustomFieldBaseId\":{{ mapArray AllCustomFieldsOutput 'Name' 'TicketURL' 'Id'}},\"CustomFieldValue\":\"{{ input.ticket.ticketURL }}\",\"CustomFieldTypeName\":\"Text\"} {{/ifEquals}}],\"KindId\":3}",
           "dataType": "application/json"
         }
       ]
@@ -247,5 +262,5 @@
       }
     }
   ],
-  "updated": "16-01-2025"
+  "updated": "20-01-2025"
 }
