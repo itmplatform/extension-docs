@@ -77,7 +77,7 @@
       "AccountId": "@@AccountId@@",
       "entity": "Task",
       "description": "Create or Update Task in ITM from Ticketing platform",
-      "condition": "input.id != null && Convert.ToInt32(input.id) != 0",
+      "condition": "input.id != null && Convert.ToInt64(input.id) != 0",
       "event": "updated",
       "async": true,
       "actions": [
@@ -85,25 +85,25 @@
           "action": "restcall",
           "url": "@@TaskMS@@/v2/{{ input.accountId }}/Projects/Search",
           "method": "POST",
-          "condition": "input.id != null && Convert.ToInt32(input.id) != 0 && Convert.ToString(input.threads.assignedTo.email) != \"\"",
+          "condition": "input.id != null && Convert.ToInt64(input.id) != 0 && Convert.ToString(input.primaryCustomer.email) != \"\"",
           "description": "Getting Project Team Members",
           "output": "teamMembers",
-          "payload": "{\"columns\":{\"$in\":[\"Team.TeamMembers\",\"Team.Managers\"]},\"Filter\":{\"id\":{{  config.projectId }},\"Team.TeamMembers.EmailAddress\":\"{{ input.threads.assignedTo.email }}\"}}",
+          "payload": "{\"columns\":{\"$in\":[\"Team.TeamMembers\",\"Team.Managers\"]},\"Filter\":{\"id\":{{ config.projectId }},\"Team.TeamMembers.EmailAddress\":\"{{ input.primaryCustomer.email }}\"}}",
           "dataType": "application/json"
         },
         {
           "action": "restcall",
           "url": "@@TaskMS@@/v2/{{ input.accountId }}/Projects/Search",
           "method": "POST",
-          "condition": "input.id != null && Convert.ToInt32(input.id) != 0 && Convert.ToString(input.threads.assignedTo.email) != \"\" && Convert.ToInt32(teamMembers.total) == 0",
+          "condition": "input.id != null && Convert.ToInt64(input.id) != 0 && Convert.ToString(input.primaryCustomer.email) != \"\" && Convert.ToInt32(teamMembers.total) == 0",
           "description": "Getting Project Team Members",
           "output": "teamMembers",
-          "payload": "{\"columns\":{\"$in\":[\"Team.TeamMembers\",\"Team.Managers\"]},\"Filter\":{\"id\":{{  config.projectId }},\"Team.Managers.EmailAddress\":\"{{ input.threads.assignedTo.email }}\"}}",
+          "payload": "{\"columns\":{\"$in\":[\"Team.TeamMembers\",\"Team.Managers\"]},\"Filter\":{\"id\":{{  config.projectId }},\"Team.Managers.EmailAddress\":\"{{ input.primaryCustomer.email }}\"}}",
           "dataType": "application/json"
         },
         {
           "action": "validate",
-          "validateCondition": "input.id != null && Convert.ToInt32(input.id) != 0 && Convert.ToString(input.threads.assignedTo.email) != \"\" && Convert.ToString(input.threads.assignedTo.email) != Convert.ToString(config.front_desk_support_email) && (Convert.ToInt32(teamMembers.total) == 0)",
+          "validateCondition": "input.id != null && Convert.ToInt64(input.id) != 0 && Convert.ToString(input.primaryCustomer.email) != \"\" && Convert.ToString(input.primaryCustomer.email) != Convert.ToString(config.front_desk_support_email) && (Convert.ToInt32(teamMembers.total) == 0)",
           "message": "The ticket assignee must be a member of the project team or the front-desk support email. Please update the assignee before proceeding."
         },
         {
@@ -112,7 +112,7 @@
           "method": "GET",
           "description": "Get Project Task Custom Fields",
           "output": "AllCustomFieldsOutput",
-          "condition": "input.id != null && Convert.ToInt32(input.id) != 0 && Convert.ToString(input.threads.assignedTo.email) != \"\"",
+          "condition": "input.id != null && Convert.ToInt64(input.id) != 0 && Convert.ToString(input.primaryCustomer.email) != \"\"",
           "payload": "",
           "dataType": "application/json"
         },
@@ -122,8 +122,8 @@
           "method": "PATCH",
           "description": "Update Existing Task",
           "output": "taskOutput",
-          "condition": "input.id != null && Convert.ToInt32(input.id) != 0 && Convert.ToString(input.threads.assignedTo.email) != \"\" && {{  mapArray input.customFields 'name' 'ITMTaskId' 'value' }} != null && Convert.ToString({{  mapArray input.customFields 'name' 'ITMTaskId' 'value' }}) != \"\"",
-          "payload": "{\"Name\":\"{{input.subject}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"Details\":\"{{ input.preview }}\",\"TaskMembers\":\"{{ input.threads.assignedTo.email }}\"}",
+          "condition": "input.id != null && Convert.ToInt64(input.id) != 0 && Convert.ToString(input.primaryCustomer.email) != \"\" && Convert.ToString({{  mapArray input.customFields 'name' 'ITMTaskId' 'value' }}) != null && Convert.ToString({{  mapArray input.customFields 'name' 'ITMTaskId' 'value' }}) != \"\"",
+          "payload": "{\"Name\":\"{{input.subject}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"Details\":\"{{ input.preview }}\",\"TaskMembers\":\"{{ input.primaryCustomer.email }}\"}",
           "dataType": "application/json"
         },
         {
@@ -132,8 +132,8 @@
           "method": "POST",
           "description": "Create New Task",
           "output": "taskOutput",
-          "condition": "input.id != null && Convert.ToInt32(input.id) != 0 && Convert.ToString(input.threads.assignedTo.email) != \"\" && ({{  mapArray input.customFields 'name' 'ITMTaskId' 'value' }} == null || Convert.ToString({{  mapArray input.customFields 'name' 'ITMTaskId' 'value' }}) == \"\")",
-          "payload": "{\"Name\":\"{{input.subject}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"TaskMembers\":\"{{ input.threads.assignedTo.email }}\",\"TypeName\":\"Generic\",\"PriorityName\":\"Normal\",\"CustomField\":[ {{#ifEquals AllCustomFieldsOutput.Name 'TicketURL'}}  {{else}} {\"CustomFieldBaseId\":{{ mapArray AllCustomFieldsOutput 'Name' 'TicketURL' 'Id'}},\"CustomFieldValue\":\"{{ input.ticket.ticketURL }}\",\"CustomFieldTypeName\":\"Text\"} {{/ifEquals}}],\"KindId\":3}",
+          "condition": "input.id != null && Convert.ToInt64(input.id) != 0 && Convert.ToString(input.primaryCustomer.email) != \"\" && (Convert.ToString({{  mapArray input.customFields 'name' 'ITMTaskId' 'value' }}) == null || Convert.ToString({{  mapArray input.customFields 'name' 'ITMTaskId' 'value' }}) == \"\")",
+          "payload": "{\"Name\":\"{{input.subject}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"TaskMembers\":\"{{ input.primaryCustomer.email }}\",\"TypeName\":\"Generic\",\"PriorityName\":\"Normal\",\"CustomField\":[ {{#ifEquals AllCustomFieldsOutput.Name 'TicketURL'}}  {{else}} {\"CustomFieldBaseId\":{{ mapArray AllCustomFieldsOutput 'Name' 'TicketURL' 'Id'}},\"CustomFieldValue\":\"{{ input.id }}\",\"CustomFieldTypeName\":\"Text\"} {{/ifEquals}}],\"KindId\":3}",
           "dataType": "application/json"
         }
       ]
