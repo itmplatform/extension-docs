@@ -123,7 +123,7 @@
           "method": "PATCH",
           "description": "Update Existing Task",
           "output": "taskOutput",
-          "condition": "input.id != null && Convert.ToInt64(input.id) != 0 && Convert.ToString(input.primaryCustomer.email) != \"\" && Convert.ToString({{  mapArray input.customFields 'name' 'ITMTaskId' 'value' }}) != null && Convert.ToString({{  mapArray input.customFields 'name' 'ITMTaskId' 'value' }}) != \"\"",
+          "condition": "input.id != null && Convert.ToInt64(input.id) != 0 && Convert.ToString(input.primaryCustomer.email) != \"\" && \"{{  mapArray input.customFields 'name' 'ITMTaskId' 'value' }}\" != \"\"",
           "payload": "{\"Name\":\"{{input.subject}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"Details\":\"{{ input.preview }}\",\"TaskMembers\":\"{{ input.primaryCustomer.email }}\"}",
           "dataType": "application/json"
         },
@@ -133,8 +133,8 @@
           "method": "POST",
           "description": "Create New Task",
           "output": "taskOutput",
-          "condition": "input.id != null && Convert.ToInt64(input.id) != 0 && Convert.ToString(input.primaryCustomer.email) != \"\" && (Convert.ToString({{  mapArray input.customFields 'name' 'ITMTaskId' 'value' }}) == null || Convert.ToString({{  mapArray input.customFields 'name' 'ITMTaskId' 'value' }}) == \"\")",
-          "payload": "{\"Name\":\"{{input.subject}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"TaskMembers\":\"{{ input.primaryCustomer.email }}\",\"TypeName\":\"Generic\",\"PriorityName\":\"Normal\",\"CustomField\":[ {{#ifEquals AllCustomFieldsOutput.Name 'TicketURL'}}  {{else}} {\"CustomFieldBaseId\":{{ mapArray AllCustomFieldsOutput 'Name' 'TicketURL' 'Id'}},\"CustomFieldValue\":\"{{ input.id }}\",\"CustomFieldTypeName\":\"Text\"} {{/ifEquals}}],\"KindId\":3}",
+          "condition": "input.id != null && Convert.ToInt64(input.id) != 0 && Convert.ToString(input.primaryCustomer.email) != \"\" && \"{{  mapArray input.customFields 'name' 'ITMTaskId' 'value' }}\" == \"\"",
+          "payload": "{\"Name\":\"{{input.subject}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"TaskMembers\":\"{{ input.primaryCustomer.email }}\",\"CustomField\":[ {{#ifEquals AllCustomFieldsOutput.Name 'TicketURL'}}  {{else}} {\"CustomFieldBaseId\":{{ mapArray AllCustomFieldsOutput 'Name' 'TicketURL' 'Id'}},\"CustomFieldValue\":\"{{ input.id }}\",\"CustomFieldTypeName\":\"Text\"} {{/ifEquals}}],\"KindId\":3}",
           "dataType": "application/json"
         }
       ]

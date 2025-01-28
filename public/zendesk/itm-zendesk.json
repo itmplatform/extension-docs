@@ -128,7 +128,7 @@
           "description": "Create New Task",
           "output": "taskOutput",
           "condition": "input.ticket != null && Convert.ToInt32(input.ticket.id) != 0 && Convert.ToString(input.ticket.ticketAssigneeEmail) != \"\" && (input.ticket.ITMTaskId == null || Convert.ToString(input.ticket.ITMTaskId) == \"\")",
-          "payload": "{\"Name\":\"{{input.ticket.name}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"TaskMembers\":\"{{ input.ticket.ticketAssigneeEmail }}\",\"TypeName\":\"Generic\",\"PriorityName\":\"Normal\",\"CustomField\":[ {{#ifEquals AllCustomFieldsOutput.Name 'TicketURL'}}  {{else}} {\"CustomFieldBaseId\":{{ mapArray AllCustomFieldsOutput 'Name' 'TicketURL' 'Id'}},\"CustomFieldValue\":\"{{ input.ticket.ticketURL }}\",\"CustomFieldTypeName\":\"Text\"} {{/ifEquals}}],\"KindId\":3}",
+          "payload": "{\"Name\":\"{{input.ticket.name}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"TaskMembers\":\"{{ input.ticket.ticketAssigneeEmail }}\",\"CustomField\":[ {{#ifEquals AllCustomFieldsOutput.Name 'TicketURL'}}  {{else}} {\"CustomFieldBaseId\":{{ mapArray AllCustomFieldsOutput 'Name' 'TicketURL' 'Id'}},\"CustomFieldValue\":\"{{ input.ticket.ticketURL }}\",\"CustomFieldTypeName\":\"Text\"} {{/ifEquals}}],\"KindId\":3}",
           "dataType": "application/json"
         }
       ]
