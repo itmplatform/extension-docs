@@ -53,11 +53,11 @@
         },
         {
           "action": "restcall",
-          "url": "{{ config.url }}/api/v2/tickets/{{ int customfields.AllCustomFields.TicketURL }}.json",
+          "url": "{{ config.url }}/api/v2/tickets/{{ int customfields.AllCustomFields.TicketId }}.json",
           "method": "PATCH",
           "description": "Update Ticket",
           "output": "ticketResponse",
-          "condition": "input.diff != null && input.diff.StatusId != null && input.diff.StatusId.new != null && Convert.ToInt32(input.diff.StatusId.new) == {{config.ready_to_reply_status_id}} && frontDeskSupportUsersOutput != null && Convert.ToInt32(frontDeskSupportUsersOutput.count) > 0 && customfields.AllCustomFields != null && Convert.ToString(customfields.AllCustomFields.TicketURL) != null",
+          "condition": "input.diff != null && input.diff.StatusId != null && input.diff.StatusId.new != null && Convert.ToInt32(input.diff.StatusId.new) == {{config.ready_to_reply_status_id}} && frontDeskSupportUsersOutput != null && Convert.ToInt32(frontDeskSupportUsersOutput.count) > 0 && customfields.AllCustomFields != null && Convert.ToString(customfields.AllCustomFields.TicketId) != null",
           "payload": "{\"ticket\":{\"assignee_id\":\"{{ frontDeskSupportUsersOutput.users.0.id }}\",\"comment\":{\"body\":\"Ticket reassigned back to Front Desk Support.\",\"public\":false}}}",
           "dataType": "application/json",
           "authentication": "basic",
@@ -128,7 +128,7 @@
           "description": "Create New Task",
           "output": "taskOutput",
           "condition": "input.ticket != null && Convert.ToInt32(input.ticket.id) != 0 && Convert.ToString(input.ticket.ticketAssigneeEmail) != \"\" && (input.ticket.ITMTaskId == null || Convert.ToString(input.ticket.ITMTaskId) == \"\")",
-          "payload": "{\"Name\":\"{{input.ticket.name}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"TaskMembers\":\"{{ input.ticket.ticketAssigneeEmail }}\",\"CustomField\":[ {{#ifEquals AllCustomFieldsOutput.Name 'TicketURL'}}  {{else}} {\"CustomFieldBaseId\":{{ mapArray AllCustomFieldsOutput 'Name' 'TicketURL' 'Id'}},\"CustomFieldValue\":\"{{ input.ticket.ticketURL }}\",\"CustomFieldTypeName\":\"Text\"} {{/ifEquals}}],\"KindId\":3}",
+          "payload": "{\"Name\":\"{{input.ticket.name}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"TaskMembers\":\"{{ input.ticket.ticketAssigneeEmail }}\",\"CustomField\":[ {{#ifEquals AllCustomFieldsOutput.Name 'TicketId'}}  {{else}} {\"CustomFieldBaseId\":{{ mapArray AllCustomFieldsOutput 'Name' 'TicketId' 'Id'}},\"CustomFieldValue\":\"{{ input.ticket.ticketURL }}\",\"CustomFieldTypeName\":\"Text\"} {{/ifEquals}}],\"KindId\":3}",
           "dataType": "application/json"
         }
       ]

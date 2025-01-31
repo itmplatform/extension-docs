@@ -60,10 +60,10 @@
         },
         {
           "action": "restcall",
-          "url": "{{ config.url }}/v2/conversations/{{ customfields.AllCustomFields.TicketURL }}",
+          "url": "{{ config.url }}/v2/conversations/{{ customfields.AllCustomFields.TicketId }}",
           "method": "PATCH",
           "description": "Update Ticket",
-          "condition": "input.diff != null && input.diff.StatusId != null && input.diff.StatusId.new != null && Convert.ToInt32(input.diff.StatusId.new) == {{config.ready_to_reply_status_id}} && frontDeskSupportUsersOutput != null && Convert.ToInt32(frontDeskSupportUsersOutput.page.number) > 0 && customfields.AllCustomFields != null && Convert.ToString(customfields.AllCustomFields.TicketURL) != null",
+          "condition": "input.diff != null && input.diff.StatusId != null && input.diff.StatusId.new != null && Convert.ToInt32(input.diff.StatusId.new) == {{config.ready_to_reply_status_id}} && frontDeskSupportUsersOutput != null && Convert.ToInt32(frontDeskSupportUsersOutput.page.number) > 0 && customfields.AllCustomFields != null && Convert.ToString(customfields.AllCustomFields.TicketId) != null",
           "payload": "{\"op\":\"replace\",\"path\":\"/assignTo\",\"value\":\"{{ frontDeskSupportUsersOutput._embedded.users.0.id }}\"}",
           "dataType": "application/json",
           "authentication": "bearer",
@@ -134,7 +134,7 @@
           "description": "Create New Task",
           "output": "taskOutput",
           "condition": "input.id != null && Convert.ToInt64(input.id) != 0 && Convert.ToString(input.assignee.email) != \"\" && \"{{  mapArray input.customFields 'name' 'ITMTaskId' 'value' }}\" == \"\"",
-          "payload": "{\"Name\":\"{{input.subject}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"TaskMembers\":\"{{ input.assignee.email }}\",\"CustomField\":[ {{#ifEquals AllCustomFieldsOutput.Name 'TicketURL'}}  {{else}} {\"CustomFieldBaseId\":{{ mapArray AllCustomFieldsOutput 'Name' 'TicketURL' 'Id'}},\"CustomFieldValue\":\"{{ input.id }}\",\"CustomFieldTypeName\":\"Text\"} {{/ifEquals}}],\"KindId\":3}",
+          "payload": "{\"Name\":\"{{input.subject}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"TaskMembers\":\"{{ input.assignee.email }}\",\"CustomField\":[ {{#ifEquals AllCustomFieldsOutput.Name 'TicketId'}}  {{else}} {\"CustomFieldBaseId\":{{ mapArray AllCustomFieldsOutput 'Name' 'TicketId' 'Id'}},\"CustomFieldValue\":\"{{ input.id }}\",\"CustomFieldTypeName\":\"Text\"} {{/ifEquals}}],\"KindId\":3}",
           "dataType": "application/json"
         }
       ]
