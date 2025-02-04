@@ -70,7 +70,6 @@
       "trigger": "webhook",
       "connector": "itm-zendesk",
       "AccountId": "@@AccountId@@",
-      "entity": "Task",
       "description": "Create or Update Task in ITM from Ticketing platform",
       "condition": "input.ticket != null && Convert.ToInt32(input.ticket.id) != 0",
       "event": "updated",

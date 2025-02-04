@@ -75,7 +75,6 @@
       "trigger": "webhook",
       "connector": "itm-helpscout",
       "AccountId": "@@AccountId@@",
-      "entity": "Task",
       "description": "Create or Update Task in ITM from Ticketing platform",
       "condition": "input.id != null && Convert.ToInt64(input.id) != 0",
       "event": "updated",
