@@ -135,6 +135,39 @@
           "condition": "input.id != null && Convert.ToInt64(input.id) != 0 && Convert.ToString(input.assignee.email) != \"\" && \"{{  mapArray input.customFields 'name' 'ITMTaskId' 'value' }}\" == \"\"",
           "payload": "{\"Name\":\"{{input.subject}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"Details\":\"{{ input.preview }}\",\"TaskMembers\":\"{{ input.assignee.email }}\",\"CustomField\":[ {{#ifEquals AllCustomFieldsOutput.Name 'TicketId'}}  {{else}} {\"CustomFieldBaseId\":{{ mapArray AllCustomFieldsOutput 'Name' 'TicketId' 'Id'}},\"CustomFieldValue\":\"{{ input.id }}\",\"CustomFieldTypeName\":\"Text\"} {{/ifEquals}}],\"KindId\":3}",
           "dataType": "application/json"
+        },
+        {
+          "action": "restcall",
+          "url": "{{ config.url }}/v2/oauth2/token",
+          "method": "POST",
+          "condition": "taskOutput != null && Convert.ToInt64(taskOutput.Id) > 0",
+          "payload": "{\"grant_type\":\"client_credentials\",\"client_id\":\"{{ config.client_id }}\",\"client_secret\":\"{{ config.client_secret }}\"}",
+          "description": "Get authentication access token",
+          "output": "authToken",
+          "dataType": "application/json"
+        },
+        {
+          "action": "restcall",
+          "url": "{{ config.url }}/v2/mailboxes/{{input.mailboxId}}/fields",
+          "method": "GET",
+          "description": "Update ticket custom field",
+          "condition": "taskOutput != null && Convert.ToInt64(taskOutput.Id) > 0",
+          "payload": "",
+          "dataType": "application/json",
+          "authentication": "bearer",
+          "output": "ticketAllCustomFields",
+          "headers": "{\"Authorization\": \"Bearer {{authToken.access_token}}\"}"
+        },
+        {
+          "action": "restcall",
+          "url": "{{ config.url }}/v2/conversations/{{ input.id }}/fields",
+          "method": "PUT",
+          "description": "Update ticket custom field",
+          "condition": "taskOutput != null && Convert.ToInt64(taskOutput.Id) > 0",
+          "payload": "{\"fields\":[{\"id\":{{ mapArray ticketAllCustomFields._embedded.fields 'name' 'ITMTaskId' 'id' }},\"value\":\"{{ taskOutput.Id }}\"}]}",
+          "dataType": "application/json",
+          "authentication": "bearer",
+          "headers": "{\"Authorization\": \"Bearer {{authToken.access_token}}\"}"
         }
       ]
     }
@@ -273,5 +306,5 @@
       }
     }
   ],
-  "updated": "11-02-2025"
+  "updated": "13-02-2025"
 }
