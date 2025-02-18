@@ -123,7 +123,7 @@
           "description": "Update Existing Task",
           "output": "taskOutput",
           "condition": "input.id != null && Convert.ToInt64(input.id) != 0 && Convert.ToString(input.assignee.email) != \"\" && \"{{  mapArray input.customFields 'name' 'ITMTaskId' 'value' }}\" != \"\"",
-          "payload": "{\"Name\":\"{{input.subject}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"Details\":{{#ifEquals \"\" (mapArray input._embedded.threads 'type' 'note' 'body' \"\")   }} \"{{DoubleQuotesReplace (mapArray input._embedded.threads 'type' 'message' 'body') }}\"{{else}}\"{{DoubleQuotesReplace (mapArray input._embedded.threads 'type' 'note' 'body') }}\" {{/ifEquals}},\"TaskMembers\":\"{{ input.assignee.email }}\"}",
+          "payload": "{\"Name\":\"{{input.subject}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"Details\":{{#ifEquals \"\" (mapArray input._embedded.threads 'type' 'note' 'body' \"\")   }} \"{{#ifEquals \"\" (mapArray input._embedded.threads 'type' 'message' 'body' \"\")   }} {{EscapeDoubleQuotes (mapArray input._embedded.threads 'type' 'customer' 'body') }} {{else}} {{EscapeDoubleQuotes (mapArray input._embedded.threads 'type' 'message' 'body') }} {{/ifEquals}}\"{{else}}\"{{EscapeDoubleQuotes (mapArray input._embedded.threads 'type' 'note' 'body') }}\" {{/ifEquals}},\"TaskMembers\":\"{{ input.assignee.email }}\"}",
           "dataType": "application/json"
         },
         {
@@ -133,7 +133,7 @@
           "description": "Create New Task",
           "output": "taskOutput",
           "condition": "input.id != null && Convert.ToInt64(input.id) != 0 && Convert.ToString(input.assignee.email) != \"\" && \"{{  mapArray input.customFields 'name' 'ITMTaskId' 'value' }}\" == \"\"",
-          "payload": "{\"Name\":\"{{input.subject}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"Details\":\"{{DoubleQuotesReplace (mapArray input._embedded.threads 'type' 'message' 'body') }}\",\"TaskMembers\":\"{{ input.assignee.email }}\",\"CustomField\":[ {{#ifEquals AllCustomFieldsOutput.Name 'TicketId'}}  {{else}} {\"CustomFieldBaseId\":{{ mapArray AllCustomFieldsOutput 'Name' 'TicketId' 'Id'}},\"CustomFieldValue\":\"{{ input.id }}\",\"CustomFieldTypeName\":\"Text\"} {{/ifEquals}}],\"KindId\":3}",
+          "payload": "{\"Name\":\"{{input.subject}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"Details\":{{#ifEquals \"\" (mapArray input._embedded.threads 'type' 'message' 'body' \"\")   }} \"{{EscapeDoubleQuotes (mapArray input._embedded.threads 'type' 'customer' 'body') }}\"{{else}}\"{{EscapeDoubleQuotes (mapArray input._embedded.threads 'type' 'message' 'body') }}\" {{/ifEquals}},\"TaskMembers\":\"{{ input.assignee.email }}\",\"CustomField\":[ {{#ifEquals AllCustomFieldsOutput.Name 'TicketId'}}  {{else}} {\"CustomFieldBaseId\":{{ mapArray AllCustomFieldsOutput 'Name' 'TicketId' 'Id'}},\"CustomFieldValue\":\"{{ input.id }}\",\"CustomFieldTypeName\":\"Text\"} {{/ifEquals}}],\"KindId\":3}",
           "dataType": "application/json"
         },
         {
