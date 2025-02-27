@@ -164,7 +164,7 @@
           "method": "PUT",
           "description": "Update ticket custom field",
           "condition": "taskOutput != null && Convert.ToInt64(taskOutput.Id) > 0",
-          "payload": "{\"fields\":[{\"id\":{{ mapArray ticketAllCustomFields._embedded.fields 'name' 'ITMTaskId' 'id' }},\"value\":\"{{ taskOutput.Id }}\"}]}",
+          "payload": "{\"fields\":[{\"id\":{{ mapArray ticketAllCustomFields._embedded.fields 'name' 'ITMTaskId' 'id' }},\"value\":\"{{ taskOutput.Id }}\"},{\"id\":{{ mapArray ticketAllCustomFields._embedded.fields 'name' 'Request Type' 'id' }},\"value\":\"{{ mapArray input.customFields 'name' 'Request Type' 'value' }}\"},{\"id\":{{ mapArray ticketAllCustomFields._embedded.fields 'name' 'Important Notes' 'id' }},\"value\":\"{{ mapArray input.customFields 'name' 'Important Notes' 'value' }}\"},{\"id\":{{ mapArray ticketAllCustomFields._embedded.fields 'name' 'Priority' 'id' }},\"value\":\"{{ mapArray input.customFields 'name' 'Priority' 'value' }}\"}]}",
           "dataType": "application/json",
           "authentication": "bearer",
           "headers": "{\"Authorization\": \"Bearer {{authToken.access_token}}\"}"
@@ -306,5 +306,5 @@
       }
     }
   ],
-  "updated": "13-02-2025"
+  "updated": "20-02-2025"
 }

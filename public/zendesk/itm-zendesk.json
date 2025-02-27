@@ -58,7 +58,7 @@
           "description": "Update Ticket",
           "output": "ticketResponse",
           "condition": "input.diff != null && input.diff.StatusId != null && input.diff.StatusId.new != null && Convert.ToInt32(input.diff.StatusId.new) == {{config.ready_to_reply_status_id}} && frontDeskSupportUsersOutput != null && Convert.ToInt32(frontDeskSupportUsersOutput.count) > 0 && customfields.AllCustomFields != null && Convert.ToString(customfields.AllCustomFields.TicketId) != null",
-          "payload": "{\"ticket\":{\"assignee_id\":\"{{ frontDeskSupportUsersOutput.users.0.id }}\",\"comment\":{\"body\":\"Ticket reassigned back to Front Desk Support.\",\"public\":false}}}",
+          "payload": "{\"ticket\":{\"assignee_id\":\"{{ frontDeskSupportUsersOutput.users.0.id }}\",\"public\":false}}}",
           "dataType": "application/json",
           "authentication": "basic",
           "username": "{{ config.email }}/token",
@@ -112,12 +112,24 @@
         },
         {
           "action": "restcall",
+          "url": "{{ config.url }}/api/v2/tickets/{{ input.ticket.id }}/comments.json?sort_order=desc",
+          "method": "GET",
+          "payload": "",
+          "description": "Get All Custom Fields",
+          "output": "ticketDescription",
+          "dataType": "application/json",
+          "authentication": "basic",
+          "username": "{{ config.email }}/token",
+          "password": "{{ config.token }}"
+        },
+        {
+          "action": "restcall",
           "url": "@@TaskMS@@/v2/{{ input.accountId }}/Projects/{{ config.projectId }}/Tasks/{{ input.ticket.ITMTaskId }}?UserId=-99&LanguageId=@@LanguageId@@",
           "method": "PATCH",
           "description": "Update Existing Task",
           "output": "taskOutput",
           "condition": "input.ticket != null && Convert.ToInt32(input.ticket.id) != 0 && Convert.ToString(input.ticket.ticketAssigneeEmail) != \"\" && input.ticket.ITMTaskId != null && Convert.ToString(input.ticket.ITMTaskId) != \"\"",
-          "payload": "{\"Name\":\"{{input.ticket.name}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"Details\":\"{{ input.ticket.description }}\",\"TaskMembers\":\"{{ input.ticket.ticketAssigneeEmail }}\"}",
+          "payload": "{\"Name\":\"{{input.ticket.name}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"Details\":\"{{EscapeDoubleQuotes ticketDescription.comments.0.html_body }}\",\"TaskMembers\":\"{{ input.ticket.ticketAssigneeEmail }}\"}",
           "dataType": "application/json"
         },
         {
@@ -126,9 +138,34 @@
           "method": "POST",
           "description": "Create New Task",
           "output": "taskOutput",
-          "condition": "input.ticket != null && Convert.ToInt32(input.ticket.id) != 0 && Convert.ToString(input.ticket.ticketAssigneeEmail) != \"\" && (input.ticket.ITMTaskId == null || Convert.ToString(input.ticket.ITMTaskId) == \"\")",
-          "payload": "{\"Name\":\"{{input.ticket.name}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"Details\":\"{{ input.ticket.description }}\",\"TaskMembers\":\"{{ input.ticket.ticketAssigneeEmail }}\",\"CustomField\":[ {{#ifEquals AllCustomFieldsOutput.Name 'TicketId'}}  {{else}} {\"CustomFieldBaseId\":{{ mapArray AllCustomFieldsOutput 'Name' 'TicketId' 'Id'}},\"CustomFieldValue\":\"{{ input.ticket.ticketURL }}\",\"CustomFieldTypeName\":\"Text\"} {{/ifEquals}}],\"KindId\":3}",
+          "payload": "{\"Name\":\"{{input.ticket.name}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"Details\":\"{{EscapeDoubleQuotes ticketDescription.comments.0.html_body}}\",\"TaskMembers\":\"{{ input.ticket.ticketAssigneeEmail }}\",\"CustomField\":[ {{#ifEquals AllCustomFieldsOutput.Name 'TicketId'}}  {{else}} {\"CustomFieldBaseId\":{{ mapArray AllCustomFieldsOutput 'Name' 'TicketId' 'Id'}},\"CustomFieldValue\":\"{{ input.ticket.id }}\",\"CustomFieldTypeName\":\"Text\"} {{/ifEquals}}],\"KindId\":3}",
           "dataType": "application/json"
+        },
+        {
+          "action": "restcall",
+          "url": "{{ config.url }}/api/v2/ticket_fields",
+          "method": "GET",
+          "payload": "",
+          "description": "Get All Custom Fields",
+          "output": "zendeskCustomFieldList",
+          "dataType": "application/json",
+          "condition": "taskOutput != null && Convert.ToInt64(taskOutput.Id) > 0",
+          "authentication": "basic",
+          "username": "{{ config.email }}/token",
+          "password": "{{ config.token }}"
+        },
+        {
+          "action": "restcall",
+          "url": "{{ config.url }}/api/v2/tickets/{{ input.ticket.id }}.json",
+          "method": "PUT",
+          "description": "Update Ticket Custom field",
+          "output": "ticketResponse",
+          "condition": "taskOutput != null && Convert.ToInt64(taskOutput.Id) > 0",
+          "payload": "{\"ticket\":{\"custom_fields\":[{\"id\":{{ mapArray zendeskCustomFieldList.ticket_fields 'title' 'ITMTaskId' 'id' }},\"value\":\"{{ taskOutput.Id }}\"}]}}",
+          "dataType": "application/json",
+          "authentication": "basic",
+          "username": "{{ config.email }}/token",
+          "password": "{{ config.token }}"
         }
       ]
     }
