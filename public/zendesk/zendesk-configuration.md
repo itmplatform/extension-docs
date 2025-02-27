@@ -21,6 +21,7 @@ Specification explain about step to configure trigger and webhook API in zendesk
         - Open `Objects and rules` tab and go to `Triggers` sub tab under Business rules
         - Create a new trigger with providing all the required fields
             - Provide any name and select `Notifications` as Trigger Category
+            - Add one AND Condition in `Meet ALL of the following conditions` Like this: Category as `Ticket Update Via` ,Operator as `is not` and Value as `Web Service (API)` this will avoid to make infinite loop between zendesk and ITM Platform sync
             - Add two ANY conditions by selecting `Ticket>Ticket` as Category, `is` as operator and Value as `Created` and `Updated` each
             - In Actions section select `Notify by > Active Webhook` and Webhook that you created in First step as a value
             - add a payload for example
