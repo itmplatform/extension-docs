@@ -15,7 +15,7 @@ The extension will synchronize ticketing system tickets with ITM Platform tasks.
 	- An `initial` one (typically `to do`) in which the task is created and when the ticket is reassigned in Zendesk
 	- A `ready-to-reply` one (typically `done`) when the agent solves or provides more information to the front desk support team
 	 Therefore, any intermediate status in ITM Platform will be ignored in the synchronization.
-- The extension requires a custom field in the ITM Platform task called `TicketURL`, type string, to store the ticket URL[^3]. See note about types [^1] and about read-only/hidden [^2]
+- The extension requires a custom field in the ITM Platform task called `TicketId`, type string, to store the ticket Id[^3]. See note about types [^1] and about read-only/hidden [^2]
 ### Configuration
 All fields are mandatory unless otherwise indicated.
 - Zendesk to ITM Platform (webhook part):
@@ -51,16 +51,17 @@ Zendesk extension configuration example:
 * If the Ticketing webhook payload doesn't include all required fields, it will gather them[^5]
 * Prechecks. These failing, it will throw a user-friendly error visible in the extension history and log, and stop
 	* It must check if the ticket assignee agent  is present in the project team or is the  `front-desk-support-email`.
-	* It must check whether the project tasks have the `TicketURL` associated. 
-* It will check if there is a project task with the custom field `TicketURL` containing the ticket `Id`
+	* It must check whether the project tasks have the `TicketId` associated. 
+* It will check if there is a project task with the custom field `TicketId` containing the ticket `Id`
 	* If it does not exist, regardless of whether the ticket was created or updated, it will create the task with:
-		* Name (`subject`), `TicketURL`, set the `inital` status 
+		* Name (`subject`), `TicketId`, set the `inital` status 
+    * Once task is created or updated, it will automatically sync Task Id in Ticketing platform with a custom field that created in specific ticketing platform e.g `ITMTaskId`
 	* Then, the recently created task or the existing task, will be updated with:
 		* Name (overwrite existing to ensure match if changed in ITM Platform)
 		* Description (see how[^6]), 
 		* Status: 
 			* If the ticket assignee is not `front-desk-support-email` (therefore is an agent/developer) set the status to `initial`
-		* `TicketURL` build from the ticket Id and the ticketing system URL
+		* `TicketId` build from the ticket Id of ticketing system
 		* If the ticket assignee is not  `front-desk-support-email`, assign the agent to the task team if it wasn't already[^8]
 ```
         +-----------------------+
@@ -77,7 +78,7 @@ Zendesk extension configuration example:
        |  (Ticket->ITM Platform)  |
        +------------+-------------+
                     | Validate inputs (agent, project, fields)
-                    | Check if a task with TicketURL exists
+                    | Check if a task with TicketId exists
                     |   - NO: create new task with 'name', 'TickertURL',  , set 'initial' status
                     |   - ALWAYS: update existing task (name, desc, status)
                     | If agent ≠ front-desk-support-email, 
@@ -91,7 +92,7 @@ Zendesk extension configuration example:
 ```
 ### ITM Platform >> Ticketing (task event)
 * `Updated` event is triggered for a task[^9]
-* If the task doesn't have a filled-in `TicketURL` custom filed, it will stop, no logging or errors to avoid log clogging.
+* If the task doesn't have a filled-in `TicketId` custom filed, it will stop, no logging or errors to avoid log clogging.
 * The code should only run if the status has changed[^9] to the `ready-to-reply` status[^10]
 * The ticket must change the assigned agent to `front-desk-support-email` [^12]
 
@@ -106,13 +107,13 @@ Zendesk extension configuration example:
                     |
              If status changed to 
               'ready-to-reply' and 
-             TicketURL is set:
+             TicketId is set:
                     v
        +---------------------------+
        |    Extension (ITM->T)     |
        | (ITM Platform->Ticketing) |
        +------------+--------------+
-                    | Identify the ticket via TicketURL
+                    | Identify the ticket via TicketId
                     | Update the ticket’s assignee to front-desk-support-email
                     v
        +---------------------------+
@@ -161,7 +162,7 @@ As an additional feature we can exclude properties when the `old` and `new` valu
 
 [^6]: Zendesk's `description` field  contains only the initial comment of a ticket, while Help Scout's `threads` array encompasses all messages within a conversation. Therefore to have all Zendesk comments you must use [Ticket Comments API](https://developer.zendesk.com/api-reference/ticketing/tickets/ticket_comments/) 
 
-[^7]: We don't prevent that there could be more than one task with the same `TicketURL`, so we should take the first one.
+[^7]: We don't prevent that there could be more than one task with the same `TicketId`, so we should take the first one.
 
 [^8]: To do things well, when a ticket changes agents, we should remove the old one. But since we admit multiple task members, for now, we can leave it as is.
 
