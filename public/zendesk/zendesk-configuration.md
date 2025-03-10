@@ -1,45 +1,68 @@
 ## Zendesk Configuration
 
-This specification explains the steps to configure a trigger and webhook API in Zendesk to use the ITM Platform - Zendesk custom extension.
+This document outlines the steps to configure a trigger and webhook API in Zendesk to integrate with the ITM Platform - Zendesk custom extension.
 
 ### Configuration Steps
-- Go to Admin Center from admin tab:
-	- Go to `Apps and integerations` tab
-	- Click on `Webhooks` option in `Actions and webhooks` sub tab
-    - Create a new webhook from by clicking `Create Webhook` button
-    	-Choose `Trigger or automation` as a way to connect
-        - Provide required fields detail like Name, Endpoint URL, Request Method Type, Request format and authentication type
-            - Enter ITM Webhook Endpoint URL with Extension Name at it end e.g `https://new-api.itmplatform.com/revamping/v2/testsmarter/webhooks/itm-zendesk` 
-            - Choose `POST` as Request Method Type
-            - Choose `JSON` as Request Format
-            - Select `Bearer token` as Authentication Type
-            - Provide token in `Token` textbox that is generated from our platform like API Key from user profile tab and save
-    - Second step is to create API token that will use by Extension to update tickets
-        - Open `Zendesk API` under `Apps and integerations` tab
-        - Enable token access from setting tab
-        - Generate new access token and add that token in Extension Config in ITM Platform in API Token field
-    - Third step is to create a trigger for Create or Update Task.
-        - Open `Objects and rules` tab and go to `Triggers` sub tab under Business rules
-        - Create a new trigger with providing all the required fields
-            - Provide any name and select `Notifications` as Trigger Category
-            - Add one AND Condition in `Meet ALL of the following conditions` Like this: Category as `Ticket Update Via` ,Operator as `is not` and Value as `Web Service (API)` this will avoid to make infinite loop between zendesk and ITM Platform sync
-            - Add two ANY conditions by selecting `Ticket>Ticket` as Category, `is` as operator and Value as `Created` and `Updated` each
-            - In Actions section select `Notify by > Active Webhook` and Webhook that you created in First step as a value
-            - add a payload for example
-            ```json
-            {
-                "ticket": {
-                    "id": {{ticket.id}} ,
-                    "name":"{{ticket.title}}",
-                    "ticketURL" : "{{ticket.url}}",
-                    "ticketRequesterEmail":"{{ticket.requester.email}}",
-                    "ticketAssigneeEmail":"{{ticket.assignee.email}}",
-                    "status":"{{ticket.status}}",
-                    "ITMTaskId": "{{ticket.ticket_field_24512485986333}}"
-                }
-            }
-            ```
-            - Replace `ticket_field_24512485986333` last id part with your custom field created in zendesk for ITM Task Id in following step and save trigger
-    - Last step is to create a Custom field for ITM Task Id
-        - Open `Fields` sub tab under `Object and rules` tab
-        - Add a new text field and replace last part of ticket field object in payload with its `Field ID`
+
+1. **Access Admin Center**  
+   - Navigate to the **Admin Center** from the **Admin** tab.
+   - Go to the **Apps and Integrations** tab.
+   - Click on **Webhooks** under the **Actions and Webhooks** sub-tab.
+
+2. **Create a Webhook**
+   - Click the **Create Webhook** button.
+   - Select **Trigger or Automation** as the connection type.
+   - Provide the required details:
+     - **Endpoint URL**: Enter the ITM Webhook Endpoint URL with the extension name appended. Example:  
+       `https://new-api.itmplatform.com/revamping/v2/testsmarter/webhooks/itm-zendesk`
+     - **Request Method**: Choose `POST`.
+     - **Request Format**: Choose `JSON`.
+     - **Authentication Type**: Select `Bearer Token`.
+     - **Token**: Enter the token generated from the ITM Platform user profile API key field and save.
+
+3. **Generate an API Token for the Extension**
+   - Open **Zendesk API** under the **Apps and Integrations** tab.
+   - Enable **Token Access** in the settings tab.
+   - Generate a new access token and add it to the **API Token** field in the **Extension Config** section of ITM Platform.
+
+4. **Create a Trigger for Task Creation or Updates**
+   - Open the **Objects and Rules** tab and go to the **Triggers** sub-tab under **Business Rules**.
+   - Create a new trigger and provide the required details:
+     - **Name**: Enter any descriptive name.
+     - **Trigger Category**: Select `Notifications`.
+     - **Conditions**:
+       - Under **Meet ALL of the following conditions**, add:  
+         - `Category`: `Ticket Update Via`  
+         - `Operator`: `is not`  
+         - `Value`: `Web Service (API)`  
+         (This prevents infinite loops between Zendesk and ITM Platform synchronization.)
+       - Under **Meet ANY of the following conditions**, add:
+         - `Category`: `Ticket > Ticket`  
+         - `Operator`: `is`  
+         - `Value`: `Created`  
+         - `Value`: `Updated`
+     - **Actions**:
+       - Select `Notify by > Active Webhook`, and choose the webhook created in Step 2.
+       - Add the following JSON payload:
+       ```json
+       {
+           "ticket": {
+               "id": "{{ticket.id}}",
+               "name": "{{ticket.title}}",
+               "ticketURL": "{{ticket.url}}",
+               "ticketRequesterEmail": "{{ticket.requester.email}}",
+               "ticketAssigneeEmail": "{{ticket.assignee.email}}",
+               "status": "{{ticket.status}}",
+               "ITMTaskId": "{{ticket.ticket_field_24512485986333}}"
+           }
+       }
+       ```
+       - Replace `ticket_field_24512485986333` with the **custom field ID** for ITM Task ID created in Step 5.
+       - Save the trigger.
+
+5. **Create a Custom Field for ITM Task ID**
+   - Open the **Fields** sub-tab under the **Objects and Rules** tab.
+   - Add a new **Text Field**.
+   - Replace the last part of the `ticket_field_24512485986333` field ID in the payload with the newly created **Field ID**.
+
+Once these steps are completed, the ITM Platform - Zendesk custom extension will be properly configured.
