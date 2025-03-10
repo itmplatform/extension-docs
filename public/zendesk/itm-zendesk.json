@@ -314,7 +314,17 @@
                     "pt": "ITM"
                 }
             }
+        },
+        {
+            "name": "HeaderConfigureTicketing",
+            "label": {
+                "en": "Before using the connector, you must configure Zendesk's webhook and triggers. Visit https://github.com/itmplatform/extension-docs/blob/main/public/zendesk/zendesk-configuration.md for more information.",
+                "es": "Antes de usar el conector, debe configurar el webhook y los disparadores de Zendesk. Visite https://github.com/itmplatform/extension-docs/blob/main/public/zendesk/zendesk-configuration.md para obtener más información.",
+                "pt": "Antes de usar o conector, você deve configurar o webhook e os gatilhos do Zendesk. Visite https://github.com/itmplatform/extension-docs/blob/main/public/zendesk/zendesk-configuration.md para obter mais informações."
+            },
+            "type": "header",
+            "required": false
         }
     ],
-    "updated": "27-02-2025"
+    "updated": "2025-03-10"
 }
