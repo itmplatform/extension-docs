@@ -1,20 +1,26 @@
-##  Helpscout Configuration
-Specification explain about step to configure webhook API and generate Secret key, ID for OAuth2.0 token in helpscout
+## Help Scout Configuration
+
+This specification explains the steps to configure the webhook API and generate the Secret Key and ID for an OAuth 2.0 token in Help Scout.
 
 ### Configuration Steps
-    - First step is to generate Client ID and Secret Key for Authentication
-	    - Go to My Profile and Go to `My Apps` last item in menu
-	    - Click on `Create My App` button
-        - Enter any APP Name and Redirection URL and create
-        - Upon creation it will provide `App ID` and `App Secret`, paste these in extension configuration in ITM Platform
-    - Second step is to create a webhook.
-        - Go to `Apps` an Apps Directory from `Manage` tab in header navigation
-        - Search for Webhook
-        - Open `Real-time notifications from Help Scout` option
-        - Generate new Webhook with any name and screte key.
-        - Add ITM Extension URL in Callback URL e.g `https://new-api.itmplatform.com/revamping/v2/testsmarter/webhooks/itm-helpscout`
-        - Choose the event upon this webhook needed to be trigger and make it active.
-    - Last step is to create a Custom field for ITM Task Id
-        - Open `Inbox` from navigation and click on setting icon 
-        - Open custom field from menu
-        - Create a new custom field with name `ITMTaskId` and `singleline`  type
+
+1. **Generate the Client ID and Secret Key for authentication:**
+   - Go to `My Profile` and navigate to `My Apps` (last item in the menu).
+   - Click on the `Create My App` button.
+   - Enter any app name and a redirection URL, then create the app.
+   - Upon creation, Help Scout will provide an `App ID` and `App Secret`.  
+     - Copy and paste these into the ITM Platform extension configuration.
+
+2. **Create a webhook:**
+   - Go to `Apps` and open the Apps Directory from the `Manage` tab in the header navigation.
+   - Search for `Webhook`.
+   - Open the `Real-time notifications from Help Scout` option.
+   - Generate a new webhook with any name and a secret key.
+   - Add the ITM Extension URL in the `Callback URL`, e.g.,  
+     `https://api.itmplatform.com/v2/{your_copmpany}/webhooks/itm-helpscout`
+   - Choose the event that should trigger the webhook and activate it.
+
+3. **Create a custom field for ITM Task ID:**
+   - Open `Inbox` from the navigation and click on the settings icon.
+   - Open `Custom Fields` from the menu.
+   - Create a new custom field with the name `ITMTaskId` and type `Single Line`.

@@ -75,6 +75,8 @@ All these examples include the code and a tutorial. It is recommended to start w
 - [Example 5](https://github.com/itmplatform/extension-docs/tree/main/example-5). Allow users to input revenue's Actual Amount if <= Projected Amount. 
     - Event-based, synchronous
 
+You can also look at the code of the [public extensions](./public/) such as the [Help Scout connector](./public/helpscout/) or the [Zendesk connector](./public/zendesk/) which include both source code and comprehensive developer guides.
+
 ## Extension General Definition
 
 <i class="far fa-code" title="Learn by example"></i> **Learn by example**

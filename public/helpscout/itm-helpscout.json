@@ -314,7 +314,17 @@
                     "pt": "ITM"
                 }
             }
-        }
+        },
+        {
+            "name": "HeaderConfigureTicketing",
+            "label": {
+              "en": "Before using the connector, you must configure Help Scout's webhook and triggers. ",
+              "es": "Además de la sincronización y la fecha a partir de la cual los proyectos e issues de Jira deben sincronizarse, puede configurar en el conector qué categorías de proyecto y tipos de issue deben sincronizarse con ITM Platform y cuáles no. También puede establecer la duración predeterminada de los issues o tareas que no tienen fecha de vencimiento en Jira.",
+              "pt": "Além da sincronização e da data a partir da qual os projetos e problemas do JIRA devem ser sincronizados, você pode configurar no Conector quais categorias de projetos e tipos de issue devem ser sincronizados com a ITM Plataform  e quais não. Você também pode definir a duração padrão para ocorrências / tarefas que não têm data de vencimento no JIRA."
+            },
+            "type": "header",
+            "required": false
+          }
     ],
     "updated": "27-02-2025"
 }
