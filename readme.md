@@ -2,13 +2,13 @@
 <img src="./extensions-mark-title-framed-blue-bckg.svg" width="300">
 </div>
 
-<!-- *** HTML version *** -->
+<!-- *** DEPRECATED HTML version *** -->
 
 <!-- Uncomment the line below before converting this file to HTML -->
 <!-- <script src="https://kit.fontawesome.com/81ab11011e.js" crossorigin="anonymous"></script> -->
 
 <!-- Comment the line below before converting this file to HTML-->
-<a href="https://developers.itmplatform.com/extension-docs/" target> HTML version of this document.</a>
+<!-- <a href="https://developers.itmplatform.com/extension-docs/" target> HTML version of this document.</a> -->
 
 <!-- *** HTML version *** -->
 
