@@ -17,7 +17,7 @@ This specification explains the steps to configure the webhook API and generate 
    - Open the `Real-time notifications from Help Scout` option.
    - Generate a new webhook with any name and a secret key.
    - Add the ITM Extension URL in the `Callback URL`, e.g.,  
-     `https://api.itmplatform.com/v2/{your_copmpany}/webhooks/itm-helpscout`
+     `https://api.itmplatform.com/v2/{your_company}/webhooks/{extension_name}`.
    - Choose the event that should trigger the webhook and activate it.
 
 3. **Create a custom field for ITM Task ID:**

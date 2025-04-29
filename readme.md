@@ -146,7 +146,7 @@ When the feature is triggered by the scheduler, you must create the [synchroniza
 
 (*) Denotes a mandatory field
 
-- `trigger`: It can be `event` or `scheduler` *
+- `trigger`: It can be `event`, `scheduler`, or `webhook` *
 - `entity`: [Entities](#terminology) * mandatory for the `event` trigger
 - `event` [System Events](#Events) * mandatory for the `event` trigger
 - `async`: `true` or `false` It applies to the `event` trigger and determines whether the execution in ITM Platform that triggered it will stop (`false`) or the extension will run in a parallel thread (`true`). The default value is `async`: `true` if not specified.
@@ -161,7 +161,7 @@ When the feature is triggered by the scheduler, you must create the [synchroniza
  - Triggers must be either `scheduler` or `event`
  - Each feature will have actions array.
 
-## Actions 
+## Features and actions 
 
 <i class="far fa-code" title="Learn by example"></i> **Learn by example**
 
@@ -527,6 +527,34 @@ You can put a condition to the event to check whether the actions should be exec
 "condition": "{{input.SomeObject.Array.0.Array.1.SomeData}} == 3"
 }
 ```
+### Webhook Trigger
+
+
+The `webhook` trigger enables ITM Platform extension features to be initiated by **HTTP requests sent from external systems**. This trigger is particularly beneficial for **real-time integrations** where a third-party application, such as a ticketing system like Zendesk, needs to instantly inform ITM Platform about events happening within that system. For instance, the Zendesk Connector uses a `webhook` trigger to create or update a task in ITM Platform based on an update event received from Zendesk.
+
+When a feature with a `webhook` trigger is executed, the **data included in the external request's payload** becomes available to the extension's subsequent actions. This data is typically accessed via the `input` object within the action definitions.
+
+<i class="fad fa-brackets" title="Reference"></i> **Reference**
+When defining a feature that is triggered by a webhook, include the following properties:
+
+*   **trigger**: Must be `"webhook"`. This field is mandatory.
+*   **AccountId**: Typically defined using the variable `@@AccountId@@`. This is automatically populated based on the company URL used in the incoming webhook request.
+*   **description**: An optional field for developers to describe the feature; it is not shown to the end-user.
+*   **condition**: An optional condition that must evaluate to true for the actions array to be executed. This follows the same rules and syntax as action conditionals.
+*   **event**: (Optional) While the ITM Platform trigger type is `webhook`, the external system's payload often describes the specific event that occurred (e.g., an "updated" event in Zendesk). This external event information is typically available within the `input` object for use in conditions or actions.
+*   **async**: Specifies whether the extension execution runs in a parallel thread (`true`) or pauses the system process that initiated it (`false`). The default value is `true`. For webhook triggers, `async: true` is commonly used.
+*   **actions**: A mandatory array defining the sequence of actions to be performed when the webhook is triggered and any conditions are met.
+
+**Calling the Webhook:**
+To trigger an extension feature configured with `trigger: "webhook"`, the external system must send an HTTP request to a dedicated endpoint within ITM Platform. The standard URL structure for this endpoint is:
+`https://api.itmplatform.com/v2/{companyURL}/webhooks/{extension-name}`
+
+*   `{companyURL}`: This part of the URL represents the URL-friendly name of your ITM Platform account (e.g., `globalcorp360`). This corresponds to the `@@AccountName@@` script variable available within the extension environment.
+*   `{extension-name}`: This is the unique internal identifier for your extension script, defined in the `name` property at the beginning of the JSON file. This name should not contain spaces or special characters.
+
+**Example URL:**
+Based on the Zendesk Connector, which has the internal name `76ee1244-77ea-454d-a5f6-c41bc98dd6a2`, and assuming a hypothetical ITM Platform company URL name of `globalcorp360`, the specific webhook URL to trigger this extension would be:
+`https://api.itmplatform.com/v2/globalcorp360/webhooks/76ee1244-77ea-454d-a5f6-c41bc98dd6a2`
 
 ## Extension Configuration 
 

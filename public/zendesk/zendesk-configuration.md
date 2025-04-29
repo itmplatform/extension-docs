@@ -14,7 +14,7 @@ This document outlines the steps to configure a trigger and webhook API in Zende
    - Select **Trigger or Automation** as the connection type.
    - Provide the required details:
      - **Endpoint URL**: Enter the ITM Webhook Endpoint URL with the extension name appended. Example:  
-       `https://new-api.itmplatform.com/revamping/v2/testsmarter/webhooks/itm-zendesk`
+       `https://api.itmplatform.com/v2/{your_company}/webhooks/{extension_name}`.
      - **Request Method**: Choose `POST`.
      - **Request Format**: Choose `JSON`.
      - **Authentication Type**: Select `Bearer Token`.
