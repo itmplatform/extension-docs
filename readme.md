@@ -556,6 +556,22 @@ To trigger an extension feature configured with `trigger: "webhook"`, the extern
 Based on the Zendesk Connector, which has the internal name `76ee1244-77ea-454d-a5f6-c41bc98dd6a2`, and assuming a hypothetical ITM Platform company URL name of `globalcorp360`, the specific webhook URL to trigger this extension would be:
 `https://api.itmplatform.com/v2/globalcorp360/webhooks/76ee1244-77ea-454d-a5f6-c41bc98dd6a2`
 
+
+**Tip – posting the full webhook body**
+
+If you need to send the whole `input` object as JSON in a `restcall` (or any action that has a `payload`), use the built‑in Handlebars helper **`json`**, which converts any object to a JSON‑formatted string:
+
+```jsonc
+"payload": "{{{ json input }}}"
+```
+
+* `json` serializes the object for you .
+* Wrap it in triple braces `{{{ … }}}` so Handlebars doesn’t escape the quotes.
+* Do **not** add extra quotes around the expression—`json` already returns a valid JSON string, ready to be used as the request body.
+
+With this one‑liner the complete webhook payload is forwarded exactly as ITM Platform received it, making debugging much easier.
+
+
 ## Extension Configuration 
 
 The `"config"` array will determine the content rendered in the extension's configuration tab on ITM Platform, displaying all fields required for your extension to operate.
@@ -834,69 +850,33 @@ The template system is based on [Handlebars](https://handlebarsjs.com/) and supp
 
 <!-- Mustache, when given a JSON structure, will try to read it and get all the values without the keys, so it is better not to pass JSON to the Mustache template -->
 
-## Additional expressions
+## Additional expressions and Handlebars Built-in helpers
 
 The following are Handlebars expressions created to specifically interact with the extension interpreter. 
 
-### Data type converters
+These helpers extend the template language with data type conversions, value replacements, and conditionals created to specifically interact with the extension interpreter.
 
-Because the extension script is written in plain text, you will need to tell the interpreter what data type you intend to pass.
+| Helper | Purpose | Example |
+|--------|---------|---------|
+| **Data type converters** |||
+| `date` | Converts a string to a date type. | `{{ date config.syncafterdate 'yyyy/MM/dd HH:mm' }}`<br>_Example:_ `"payload": "{\"jql\" : \"updated >= '{{ date config.syncafterdate 'yyyy/MM/dd HH:mm' }}'\" }"` |
+| `timespan` | Converts a string to a time span. | `{{ timespan taskdetails.list.0.Efforts.Estimated }}`<br>_Example:_ `"payload": "{\"timetracking\": {\"originalEstimate\": {{ timespan taskdetails.list.0.Efforts.Estimated }} }"` |
+| `timespanFromSeconds` | Converts seconds to a time span. | `{{ timespanFromSeconds singleworklog.timeSpentSeconds 'hh\\:mm'}}`<br>_Example:_ `"payload": "{\"ReportedHours\": \"{{ timespanFromSeconds singleworklog.timeSpentSeconds 'hh\\:mm'}}\" }"` |
+| `int` | Converts a string to an integer. | `{{ int '42' }}` |
+| **Value replacements** |||
+| `map` | Replaces a mapped value with its equivalent, as defined in the [field mapping](#field-mapping). | `{{ map config.mapping.projecttype.external singlejiraproject.projectCategory.id }}`<br>_Example:_ `"payload": "{\"TypeId\": {{ map config.mapping.projecttype.external singlejiraproject.projectCategory.id }} }"` |
+| `mapArray` | Maps an array of values. | `{{ mapArray customfields 'Name' 'Jira Link' 'Id' }}`<br>_Example:_ `"payload": "{\"CustomField\": [{ \"CustomFieldBaseId\": {{ mapArray customfields 'Name' 'Jira Link' 'Id'}} }] }"` |
+| `StringReplace` | Replaces text in a string. | `{{ StringReplace input.description "old" "new" }}` |
+| `DoubleQuotesReplace` | Escapes double quotes as `&quot;`. | `{{ DoubleQuotesReplace singlejiraissue.fields.summary }}`<br>_Example:_ `"payload": "{\"Name\": \"{{ DoubleQuotesReplace singlejiraissue.fields.summary }}\" }"` |
+| `json` | Serializes an object to JSON. | `{{{ json input }}}`<br>_Example:_ `"payload": {{{ json input }}}"` (sends the full object as JSON) |
+| **Conditionals** |||
+| `ifempty` | Executes a block if the value is empty. | `{{#ifempty context.LastExecution}}No last execution{{else}}Last executed{{/ifempty}}`<br>_Example:_ `"payload": "{\"jql\": \"... {{#ifempty context.LastExecution}}...{{else}}...{{/ifempty}}\" }"` |
+| `ifNull` | Executes a block if the value is null. | `{{#ifNull input.assignee}}Unassigned{{/ifNull}}` |
+| `ifEquals` | Executes a block if two values are equal. | `{{#ifEquals input.status 'closed'}}Closed{{/ifEquals}}`<br>_Example:_ `"payload": \"EndDate\": {{#ifEquals singlejiraissue.fields.duedate '' }}\"{{DateTime.Now \"yyyy-MM-dd\"}}\"{{else}}\"{{ date singlejiraissue.fields.duedate 'yyyy-MM-dd'}}\"{{/ifEquals}}"` |
+| `ifNotEquals` | Executes a block if two values are not equal. | `{{#ifNotEquals input.status 'open'}}Not open{{/ifNotEquals}}` |
+| `ifext` | Executes a block based on a custom boolean expression. | `{{#ifext (input.priority > 3)}}High priority{{/ifext}}` |
 
-- `date`: Transforms a string to a date type.
-    - Parameters: `input` `format`
-    - Example: `"payload": "{\"jql\" : \"updated >= '{{ date config.syncafterdate 'yyyy/MM/dd HH:mm' }} \" }"`
-- `timespan`  Transforms a string to a time type. 
-    - Parameters: `input`
-    - Example: `"payload": "{\"timetracking\": {\"originalEstimate\": {{ timespan taskdetails.list.0.Efforts.Estimated }}\" }"`
-
-- `timespanFromSeconds` Transforms seconds to a time type
-    - Parameters: `input`
-    - Example: `"payload": "{\"ReportedHours\": \"{{ timespanFromSeconds singleworklog.timeSpentSeconds 'hh\\:mm'}}\" }"`
-- `int` Transforms a string to an integer.
-<!-- cannot find any int example within extensions -->
-
-### Value replacements
-
-- `map` Replaces a mapped value with its equivalent, as defined in the [field mapping](#field-mapping)
-    - Parameters: `map reference` `input value`
-    - Example: `"payload": "{\"TypeId\": {{ map config.mapping.projecttype.external singlejiraproject.projectCategory.id }},\" }"`
-- `mapArray` Get mapping from the array passed in parameter.
-    - Parameters: `map reference` `input value`
-    - Example: `"payload": "{\"CustomField\": [{ \"CustomFieldBaseId\": {{ mapArray customfields 'Name' 'Jira Link' 'Id'}} }] }"`
-<!-- This is not clear -->
-- `StringReplace` Replaces the second argument with the third argument in the first argument.
-<!-- This is not clear. No examples in existing extensions -->
-- `DoubleQuotesReplace` Encodes double Quotes(") with `&quot;`.
-    - Parameters: `input`
-    - Example: `"payload": "{\"Name\": \"{{ DoubleQuotesReplace singlejiraissue.fields.summary }}\" }"`
-- `json` Returns serialized object from json
-<!-- This is not clear. No examples in existing extensions -->
-
-### Conditionals
-
-- `ifempty` If the value given in the argument is empty then it executes the first statement otherwise second.
-                  "payload": "{\"jql\" : \"project = {{ singlejiraproject.id }} AND updated >= '{{#ifempty context.LastExecution }}{{ date config.syncafterdate 'yyyy/MM/dd HH:mm' }}{{else}}-{{ config.synchronizationfrequency }}m{{/ifempty}}'\", \"startAt\" : 0, \"maxResults\" : 1000}",
-
-- `ifext` If the condition given in the argument is satisfied then it executes the first statement otherwise second.
-<!-- This is not clear. No examples in existing extensions -->
-
-- `ifNull` Executes the first statement if the value passed is null otherwise executes the second statement.
-<!-- This is not clear. No examples in existing extensions -->
-
-- `ifEquals` If 2 values given in the argument are matched then it executes the first statement otherwise second.
-                      "payload": "{\"Name\": \"{{ singlejiraissue.fields.summary }}\",\"Details\": \"{{ adfParserDescription singlejiraissue.fields.description }}\",\"JiraURL\": \"{{ config.url }}\",\"SynchronizationSource\": \"Jira\",\"StartDate\": \"{{ date singlejiraissue.fields.created 'yyyy-MM-dd'}}\",\"EndDate\": {{#ifEquals singlejiraissue.fields.duedate '' }}\"{{DateTime.Now \"yyyy-MM-dd\"}}\"{{else}}\"{{ date singlejiraissue.fields.duedate 'yyyy-MM-dd'}}\"{{/ifEquals}},\"TypeName\": \"{{ map config.mapping.issuetype.external singlejiraissue.fields.issuetype.id }}\" ,\"PriorityName\": \"{{ map config.mapping.issuepriority.external singlejiraissue.fields.priority.id }}\"{{#ifEquals itmproject.list.0.MethodTypeId '2' }},\"KanbanId\":{{ kanbantaskstatus.KanbanId }}{{else}},\"StatusName\":\"{{ map config.mapping.issuestatus.external singlejiraissue.fields.status.id }}\"{{/ifEquals}} }",
-
-- `ifNotEquals` If 2 values given in the argument are not matched then it executes the first statement otherwise second.
-<!-- No examples in existing extensions -->
-
-<!-- Internal  
-
-- `imagevariant` Inserts the third argument at the last index of the second argument in the first argument.
-This is not clear. No examples in existing extensions 
-- `adfParserDescription` Replaces Double Quotes(") in given argument with &quot; (Specially made for jira issue description)
-This is not clear. 
-                      "payload": "{\"Name\": \"{{ singlejiraissue.fields.summary }}\",\"Details\": \"{{ adfParserDescription singlejiraissue.fields.description }}\",\"JiraURL\": \"{{ config.url }}\",\"SynchronizationSource\": \"Jira\",\"StartDate\": \"{{ date singlejiraissue.fields.created 'yyyy-MM-dd'}}\",\"EndDate\": {{#ifEquals singlejiraissue.fields.duedate '' }}\"{{DateTime.Now \"yyyy-MM-dd\"}}\"{{else}}\"{{ date singlejiraissue.fields.duedate 'yyyy-MM-dd'}}\"{{/ifEquals}},\"TypeName\": \"{{ map config.mapping.issuetype.external singlejiraissue.fields.issuetype.id }}\" ,\"PriorityName\": \"{{ map config.mapping.issuepriority.external singlejiraissue.fields.priority.id }}\"{{#ifEquals itmproject.list.0.MethodTypeId '2' }},\"KanbanId\":{{ kanbantaskstatus.KanbanId }}{{else}},\"StatusName\":\"{{ map config.mapping.issuestatus.external singlejiraissue.fields.status.id }}\"{{/ifEquals}} }",
- --> -->
+**Note:** Always use triple braces `{{{ ... }}}` with `json` to avoid escaping quotes in JSON payloads.
 
 ## Accessing array of items 
 Mustache syntax won't work. To access the first item in a array, instead of something like `taskTeam.list.[0].Team`, it will have to be: `taskTeam.list.First.Team`
