@@ -1,0 +1,271 @@
+{
+    "name": "43c84d2b-39af-45e4-a200-0d04a92f92de",
+    "svgString": "...",
+    "details": {
+        "title": {
+            "en": "Proactivanet ITM Platform Connector",
+            "es": "Proactivanet ITM Platform Connector",
+            "pt": "Proactivanet ITM Platform Connector"
+            
+        },
+        "version": "0.0.1",
+        "shortDescription": {
+            "en": "Creates a project in ITM Platform based on the ticket information",
+            "es": "Creates a project in ITM Platform based on the ticket information",
+            "pt": "Creates a project in ITM Platform based on the ticket information"
+        },
+        "longDescription": {
+            "en": "",
+            "es": "",
+            "pt": ""
+        }
+
+    },
+    "features": [
+        {
+            "trigger": "webhook",
+            "connector": "43c84d2b-39af-45e4-a200-0d04a92f92de",
+            "AccountId": "@@AccountId@@",
+            "description": "Create or Update Task in ITM from Ticketing platform",
+            "condition": "input.id != null && Convert.ToInt64(input.id) != 0",
+            "event": "updated",
+            "async": true,
+            "authentication": false,
+            "actions": [
+                {
+                    "action": "restcall",
+                    "url": "@@TaskMS@@/v2/{{ input.accountId }}/Projects/Search",
+                    "method": "POST",
+                    "condition": "input.id != null && Convert.ToInt64(input.id) != 0 && Convert.ToString(input.assignee.email) != \"\"",
+                    "description": "Getting Project Team Members",
+                    "output": "teamMembers",
+                    "payload": "{\"columns\":{\"$in\":[\"Team.TeamMembers\",\"Team.Managers\"]},\"Filter\":{\"id\":{{ config.projectId }},\"Team.TeamMembers.EmailAddress\":\"{{ input.assignee.email }}\"}}",
+                    "dataType": "application/json"
+                },
+                {
+                    "action": "restcall",
+                    "url": "@@TaskMS@@/v2/{{ input.accountId }}/Projects/Search",
+                    "method": "POST",
+                    "condition": "input.id != null && Convert.ToInt64(input.id) != 0 && Convert.ToString(input.assignee.email) != \"\" && Convert.ToInt32(teamMembers.total) == 0",
+                    "description": "Getting Project Team Members",
+                    "output": "teamMembers",
+                    "payload": "{\"columns\":{\"$in\":[\"Team.TeamMembers\",\"Team.Managers\"]},\"Filter\":{\"id\":{{ config.projectId }},\"Team.Managers.EmailAddress\":\"{{ input.assignee.email }}\"}}",
+                    "dataType": "application/json"
+                },
+                {
+                    "action": "validate",
+                    "validateCondition": "input.id != null && Convert.ToInt64(input.id) != 0 && Convert.ToString(input.assignee.email) != \"\" && Convert.ToString(input.assignee.email) != Convert.ToString(config.front_desk_support_email) && (Convert.ToInt32(teamMembers.total) == 0)",
+                    "message": "The ticket assignee must be a member of the project team or the front-desk support email. Please update the assignee before proceeding."
+                },
+                {
+                    "action": "restcall",
+                    "url": "@@TaskMS@@/v2/{{ input.accountId }}/tasks/CustomFields",
+                    "method": "GET",
+                    "description": "Get Project Task Custom Fields",
+                    "output": "AllCustomFieldsOutput",
+                    "condition": "input.id != null && Convert.ToInt64(input.id) != 0 && Convert.ToString(input.assignee.email) != \"\"",
+                    "payload": "",
+                    "dataType": "application/json"
+                },
+                {
+                    "action": "restcall",
+                    "url": "@@TaskMS@@/v2/{{ input.accountId }}/Projects/{{ config.projectId }}/Tasks/{{  mapArray input.customFields 'name' 'ITMTaskId' 'value' }}?UserId=-99&LanguageId=@@LanguageId@@",
+                    "method": "PATCH",
+                    "description": "Update Existing Task",
+                    "output": "taskOutput",
+                    "condition": "input.id != null && Convert.ToInt64(input.id) != 0 && Convert.ToString(input.assignee.email) != \"\" && \"{{  mapArray input.customFields 'name' 'ITMTaskId' 'value' }}\" != \"\"",
+                    "payload": "{\"Name\":\"{{input.subject}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"Details\":{{#ifEquals \"\" (mapArray input._embedded.threads 'type' 'note' 'body' \"\")   }} \"{{#ifEquals \"\" (mapArray input._embedded.threads 'type' 'message' 'body' \"\")   }} {{EscapeDoubleQuotes (mapArray input._embedded.threads 'type' 'customer' 'body') }} {{else}} {{EscapeDoubleQuotes (mapArray input._embedded.threads 'type' 'message' 'body') }} {{/ifEquals}}\"{{else}}\"{{EscapeDoubleQuotes (mapArray input._embedded.threads 'type' 'note' 'body') }}\" {{/ifEquals}},\"TaskMembers\":\"{{ input.assignee.email }}\"}",
+                    "dataType": "application/json"
+                },
+                {
+                    "action": "restcall",
+                    "url": "@@TaskMS@@/v2/{{ input.accountId }}/Projects/{{ config.projectId }}/Tasks?UserId=-99&LanguageId=@@LanguageId@@",
+                    "method": "POST",
+                    "description": "Create New Task",
+                    "output": "taskOutput",
+                    "condition": "input.id != null && Convert.ToInt64(input.id) != 0 && Convert.ToString(input.assignee.email) != \"\" && \"{{  mapArray input.customFields 'name' 'ITMTaskId' 'value' }}\" == \"\"",
+                    "payload": "{\"Name\":\"{{input.subject}}\",\"StatusId\":\"{{ config.initial_status_id }}\",\"Details\":{{#ifEquals \"\" (mapArray input._embedded.threads 'type' 'message' 'body' \"\")   }} \"{{EscapeDoubleQuotes (mapArray input._embedded.threads 'type' 'customer' 'body') }}\"{{else}}\"{{EscapeDoubleQuotes (mapArray input._embedded.threads 'type' 'message' 'body') }}\" {{/ifEquals}},\"TaskMembers\":\"{{ input.assignee.email }}\",\"CustomField\":[ {{#ifEquals AllCustomFieldsOutput.Name 'TicketId'}}  {{else}} {\"CustomFieldBaseId\":{{ mapArray AllCustomFieldsOutput 'Name' 'TicketId' 'Id'}},\"CustomFieldValue\":\"{{ input.id }}\",\"CustomFieldTypeName\":\"Text\"} {{/ifEquals}}],\"KindId\":3}",
+                    "dataType": "application/json"
+                },
+                {
+                    "action": "restcall",
+                    "url": "{{ config.url }}/v2/oauth2/token",
+                    "method": "POST",
+                    "condition": "taskOutput != null && Convert.ToInt64(taskOutput.Id) > 0",
+                    "payload": "{\"grant_type\":\"client_credentials\",\"client_id\":\"{{ config.client_id }}\",\"client_secret\":\"{{ config.client_secret }}\"}",
+                    "description": "Get authentication access token",
+                    "output": "authToken",
+                    "dataType": "application/json"
+                },
+                {
+                    "action": "restcall",
+                    "url": "{{ config.url }}/v2/mailboxes/{{input.mailboxId}}/fields",
+                    "method": "GET",
+                    "description": "Update ticket custom field",
+                    "condition": "taskOutput != null && Convert.ToInt64(taskOutput.Id) > 0",
+                    "payload": "",
+                    "dataType": "application/json",
+                    "authentication": "bearer",
+                    "output": "ticketAllCustomFields",
+                    "headers": "{\"Authorization\": \"Bearer {{authToken.access_token}}\"}"
+                },
+                {
+                    "action": "restcall",
+                    "url": "{{ config.url }}/v2/conversations/{{ input.id }}/fields",
+                    "method": "PUT",
+                    "description": "Update ticket custom field",
+                    "condition": "taskOutput != null && Convert.ToInt64(taskOutput.Id) > 0",
+                    "payload": "{\"fields\":[{\"id\":{{ mapArray ticketAllCustomFields._embedded.fields 'name' 'ITMTaskId' 'id' }},\"value\":\"{{ taskOutput.Id }}\"},{\"id\":{{ mapArray ticketAllCustomFields._embedded.fields 'name' 'Request Type' 'id' }},\"value\":\"{{ mapArray input.customFields 'name' 'Request Type' 'value' }}\"},{\"id\":{{ mapArray ticketAllCustomFields._embedded.fields 'name' 'Important Notes' 'id' }},\"value\":\"{{ mapArray input.customFields 'name' 'Important Notes' 'value' }}\"},{\"id\":{{ mapArray ticketAllCustomFields._embedded.fields 'name' 'Priority' 'id' }},\"value\":\"{{ mapArray input.customFields 'name' 'Priority' 'value' }}\"}]}",
+                    "dataType": "application/json",
+                    "authentication": "bearer",
+                    "headers": "{\"Authorization\": \"Bearer {{authToken.access_token}}\"}"
+                }
+            ]
+        }
+    ],
+    "config": [
+        {
+            "name": "isactive",
+            "label": {
+                "en": "Activate extension",
+                "es": "Activar extensión",
+                "pt": "Ativar extensão"
+            },
+            "tooltip": {
+                "en": "Activate extension to start syncing tasks between ITM Platform and Proactivanet",
+                "es": "Active la extensión para comenzar a sincronizar tareas entre ITM Platform y Proactivanet",
+                "pt": "Ative a extensão para começar a sincronizar tarefas entre a ITM Platform e o Proactivanet"
+            },
+            "type": "checkbox",
+            "required": false
+        },
+        {
+            "name": "url",
+            "label": {
+                "en": "Proactivanet URL",
+                "es": "URL de Proactivanet",
+                "pt": "Proactivanet URL"
+            },
+            "tooltip": {
+                "en": "URL of the Proactivanet account",
+                "es": "URL de la cuenta de Proactivanet",
+                "pt": "URL da conta Proactivanet"
+            },
+            "type": "string",
+            "required": true
+        },
+        {
+            "name": "front_desk_support_email",
+            "label": {
+                "en": "Support email",
+                "es": "Email de soporte",
+                "pt": "E-mail de suporte"
+            },
+            "tooltip": {
+                "en": "Support email in the ticketing platform",
+                "es": "Email de soporte en la plataforma de tickets",
+                "pt": "E-mail de suporte na plataforma de tickets"
+            },
+            "type": "string",
+            "required": true
+        },
+        {
+            "name": "client_id",
+            "label": {
+                "en": "Client Id",
+                "es": "Client Id",
+                "pt": "Client Id"
+            },
+            "tooltip": {
+                "en": "Client Id generated by Proactivanet",
+                "es": "Client Id generado por Proactivanet",
+                "pt": "Client Id gerado pelo Proactivanet"
+            },
+            "type": "string",
+            "required": true
+        },
+        {
+            "name": "client_secret",
+            "label": {
+                "en": "Client Secret",
+                "es": "Client Secret",
+                "pt": "Client Secret"
+            },
+            "tooltip": {
+                "en": "Client Secret generated by Proactivanet",
+                "es": "Client Secret generado por Proactivanet",
+                "pt": "Client Secret gerado pelo Proactivanet"
+            },
+            "type": "string",
+            "required": true
+        },
+        {
+            "name": "projectId",
+            "label": {
+                "en": "Project Id",
+                "es": "Project Id",
+                "pt": "Project Id"
+            },
+            "tooltip": {
+                "en": "Project Id where tasks will be created. Agile projects only.",
+                "es": "Project Id donde se crearán las tareas. Solo proyectos ágiles.",
+                "pt": "Project Id onde as tarefas serão criadas. Apenas projetos ágeis."
+            },
+            "type": "string",
+            "required": true
+        },
+        {
+            "name": "initial_status_id",
+            "label": {
+                "en": "Intial Status Id",
+                "es": "Intial Status Id",
+                "pt": "Intial Status Id"
+            },
+            "type": "dropdown",
+            "data": {
+                "isFromITM": true,
+                "method": "GET",
+                "url": "v2/@@companyId@@/Projects/@@projectId@@/GetKanbanTaskStatus",
+                "id": "Id",
+                "name": "Name",
+                "columnName": {
+                    "en": "ITM",
+                    "es": "ITM",
+                    "pt": "ITM"
+                }
+            },
+            "tooltip": {
+                "en": "Initial status of the task in ITM Platform",
+                "es": "Estado inicial de la tarea en ITM Platform",
+                "pt": "Status inicial da tarefa no ITM Platform"
+            }
+        },
+        {
+            "name": "ready_to_reply_status_id",
+            "label": {
+                "en": "Initial Status",
+                "es": "Estado inicial",
+                "pt": "Status inicial"
+            },
+            "tooltip": {
+                "en": "Status (column) that will indicate the ticket is done",
+                "es": "Estado (columna) que indicará que el ticket está hecho",
+                "pt": "Status (coluna) que indicará que o ticket está feito"
+            },
+            "type": "dropdown",
+            "data": {
+                "isFromITM": true,
+                "method": "GET",
+                "url": "v2/@@companyId@@/Projects/@@projectId@@/GetKanbanTaskStatus",
+                "id": "Id",
+                "name": "Name",
+                "columnName": {
+                    "en": "ITM",
+                    "es": "ITM",
+                    "pt": "ITM"
+                }
+            }
+        }
+    ],
+    "updated": "2025-05-19"
+}
