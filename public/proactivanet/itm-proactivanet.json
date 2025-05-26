@@ -19,7 +19,6 @@
             "es": "",
             "pt": ""
         }
-
     },
     "features": [
         {
@@ -135,7 +134,7 @@
                 },
                 {
                     "action": "restcall",
-                    "url": "{{ config.url }}/v2/oauth2/token",
+                    "url": "{{ config.url }}/api/auth/login",
                     "method": "POST",
                     "condition": "taskOutput != null && Convert.ToInt64(taskOutput.Id) > 0",
                     "payload": "{\"grant_type\":\"client_credentials\",\"client_id\":\"{{ config.client_id }}\",\"client_secret\":\"{{ config.client_secret }}\"}",
@@ -145,7 +144,7 @@
                 },
                 {
                     "action": "restcall",
-                    "url": "{{ config.url }}/v2/mailboxes/{{input.mailboxId}}/fields",
+                    "url": "{{ config.url }}/api/Incidents/{{ input.id }}/customFields",
                     "method": "GET",
                     "description": "Update ticket custom field",
                     "condition": "taskOutput != null && Convert.ToInt64(taskOutput.Id) > 0",
@@ -157,11 +156,11 @@
                 },
                 {
                     "action": "restcall",
-                    "url": "{{ config.url }}/v2/conversations/{{ input.id }}/fields",
+                    "url": "{{ config.url }}/api/Incidents/{{ input.id }}/customFields/{{ mapArray ticketAllCustomFields._embedded.fields 'name' 'ITMTaskId' 'id' }}",
                     "method": "PUT",
                     "description": "Update ticket custom field",
                     "condition": "taskOutput != null && Convert.ToInt64(taskOutput.Id) > 0",
-                    "payload": "{\"fields\":[{\"id\":{{ mapArray ticketAllCustomFields._embedded.fields 'name' 'ITMTaskId' 'id' }},\"value\":\"{{ taskOutput.Id }}\"},{\"id\":{{ mapArray ticketAllCustomFields._embedded.fields 'name' 'Request Type' 'id' }},\"value\":\"{{ mapArray input.customFields 'name' 'Request Type' 'value' }}\"},{\"id\":{{ mapArray ticketAllCustomFields._embedded.fields 'name' 'Important Notes' 'id' }},\"value\":\"{{ mapArray input.customFields 'name' 'Important Notes' 'value' }}\"},{\"id\":{{ mapArray ticketAllCustomFields._embedded.fields 'name' 'Priority' 'id' }},\"value\":\"{{ mapArray input.customFields 'name' 'Priority' 'value' }}\"}]}",
+                    "payload": "{\"Value\":\"{{ taskOutput.Id }}\"}",
                     "dataType": "application/json",
                     "authentication": "bearer",
                     "headers": "{\"Authorization\": \"Bearer {{authToken.access_token}}\"}"
