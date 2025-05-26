@@ -23,6 +23,52 @@
     },
     "features": [
         {
+            "trigger": "event",
+            "connector": "43c84d2b-39af-45e4-a200-0d04a92f92de",
+            "AccountId": "@@AccountId@@",
+            "entity": "Task",
+            "description": "Task update Event, which will update 'Ticket' in Ticketing Platform",
+            "condition": "input.diff != null && input.diff.StatusId != null && input.diff.StatusId.new != null && Convert.ToInt32(input.diff.StatusId.new) != 0 && Convert.ToInt32(input.userId) != -99",
+            "event": "updated",
+            "async": true,
+            "actions": [
+                {
+                    "action": "restcall",
+                    "url": "@@TaskMS@@/v2/{{ input.accountId }}/Projects/{{ input.projectId }}/Tasks/{{ input.task.Id }}",
+                    "method": "POST",
+                    "description": "(1) Getting CustomFields values for project of ITM.",
+                    "output": "customfields",
+                    "payload": "{\"columns\":{\"$in\":[\"AllCustomFields\"]}}",
+                    "dataType": "application/json"
+                },
+                {
+                    "action": "restcall",
+                    "url": "{{ config.url }}/api/v2/users/search.json?query={{ config.front_desk_support_email }}",
+                    "method": "GET",
+                    "payload": "",
+                    "description": "Get Ticketing User List",
+                    "output": "frontDeskSupportUsersOutput",
+                    "dataType": "application/json",
+                    "authentication": "basic",
+                    "username": "{{ config.email }}/token",
+                    "password": "{{ config.token }}"
+                },
+                {
+                    "action": "restcall",
+                    "url": "{{ config.url }}/api/v2/tickets/{{ int customfields.AllCustomFields.TicketId }}.json",
+                    "method": "PATCH",
+                    "description": "Update Ticket",
+                    "output": "ticketResponse",
+                    "condition": "input.diff != null && input.diff.StatusId != null && input.diff.StatusId.new != null && Convert.ToInt32(input.diff.StatusId.new) == {{config.ready_to_reply_status_id}} && frontDeskSupportUsersOutput != null && Convert.ToInt32(frontDeskSupportUsersOutput.count) > 0 && customfields.AllCustomFields != null && Convert.ToString(customfields.AllCustomFields.TicketId) != null",
+                    "payload": "{\"ticket\":{\"assignee_id\":\"{{ frontDeskSupportUsersOutput.users.0.id }}\",\"public\":false}}}",
+                    "dataType": "application/json",
+                    "authentication": "basic",
+                    "username": "{{ config.email }}/token",
+                    "password": "{{ config.token }}"
+                }
+            ]
+        },
+        {
             "trigger": "webhook",
             "connector": "43c84d2b-39af-45e4-a200-0d04a92f92de",
             "AccountId": "@@AccountId@@",
