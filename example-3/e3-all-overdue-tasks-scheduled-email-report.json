@@ -1,0 +1,109 @@
+{
+	"name": "itmplatform-overdue-tasks-scheduled-email-report",
+	"svgString": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 640' fill='#495d73'><path d='M197.8 100.3C208.7 107.9 211.3 122.9 203.7 133.7L147.7 213.7C143.6 219.5 137.2 223.2 130.1 223.8C123 224.4 116 222 111 217L71 177C61.7 167.6 61.7 152.4 71 143C80.3 133.6 95.6 133.7 105 143L124.8 162.8L164.4 106.2C172 95.3 187 92.7 197.8 100.3zM197.8 260.3C208.7 267.9 211.3 282.9 203.7 293.7L147.7 373.7C143.6 379.5 137.2 383.2 130.1 383.8C123 384.4 116 382 111 377L71 337C61.6 327.6 61.6 312.4 71 303.1C80.4 293.8 95.6 293.7 104.9 303.1L124.7 322.9L164.3 266.3C171.9 255.4 186.9 252.8 197.7 260.4zM288 160C288 142.3 302.3 128 320 128L544 128C561.7 128 576 142.3 576 160C576 177.7 561.7 192 544 192L320 192C302.3 192 288 177.7 288 160zM288 320C288 302.3 302.3 288 320 288L544 288C561.7 288 576 302.3 576 320C576 337.7 561.7 352 544 352L320 352C302.3 352 288 337.7 288 320zM224 480C224 462.3 238.3 448 256 448L544 448C561.7 448 576 462.3 576 480C576 497.7 561.7 512 544 512L256 512C238.3 512 224 497.7 224 480zM128 440C150.1 440 168 457.9 168 480C168 502.1 150.1 520 128 520C105.9 520 88 502.1 88 480C88 457.9 105.9 440 128 440z'/></svg>",
+	"details": {
+		"title": {
+			"en": "Overdue Tasks — Email Report",
+			"es": "Tareas vencidas — Informe por email",
+			"pt": "Tarefas em atraso — Relatório por email"
+		},
+		"version": "1.0.0",
+		"shortDescription": {
+			"en": "Sends up to 250 overdue tasks (EndDate ≤ today, status not closed) to a fixed email.",
+			"es": "Envía hasta 250 tareas vencidas (Fecha fin ≤ hoy, estado no cerrado) a un email fijo.",
+			"pt": "Envia até 250 tarefas em atraso (Data fim ≤ hoje, status não encerrado) para um email fixo."
+		},
+		"updated": "2025-10-08",
+		"developer": "Your Team"
+	},
+	"features": [
+		{
+			"trigger": "scheduler",
+			"async": true,
+			"description": "Daily (or as configured) account-wide overdue tasks report to a fixed recipient.",
+			"actions": [
+				{
+					"action": "restcall",
+					"url": "@@ITMAPI@@/@@AccountName@@/login/{{ config.apikey }}",
+					"method": "POST",
+					"description": "Login with API Key",
+					"output": "loginInfo",
+					"payload": "",
+					"dataType": "application/json"
+				},
+				{
+					"action": "restcall",
+					"url": "@@ITMAPI@@/v2/@@AccountName@@/Tasks/Search",
+					"method": "POST",
+					"description": "Fetch overdue tasks across the account (first 250)",
+					"token": "{{ loginInfo.Token }}",
+					"output": "tasks",
+					"dataType": "application/json",
+					"payload": "{\"page\": 1, \"pageSize\": 250, \"filter\": { \"KindId\": { \"$in\": [3] }, \"Status.Type.Id\": { \"$nin\": [3] }, \"EndDate\": { \"$lte\": \"{{ DateTime.Now \"yyyy-MM-dd\" }}\" }, \"ProjectDetails.MethodTypeId\": { \"$in\": [1] }}, \"columns\": { \"$in\": [\"Id\", \"Name\", \"StartDate\", \"EndDate\", \"Status.Name\", \"ProjectDetails.Managers.DisplayName\" ] }}"
+				},
+				{
+					"action": "email",
+					"to": "{{ config.recipientEmail }}",
+					"subject": "Overdue tasks — {{ DateTime.Now \"yyyy-MM-dd\" }} ({{ tasks.total }} total; showing up to {{ tasks.pageSize }})",
+					"body": "<html><body style=\"font-family:Arial,Helvetica,sans-serif;\">{{#ifempty tasks.list}}<p>No overdue tasks as of .</p>{{else}}<p>Overdue tasks as of <strong>{{ DateTime.Now \"yyyy-MM-dd\" }}</strong>. Showing the first {{ tasks.list.Count }} of {{ tasks.total }}.</p><table cellpadding=\"6\" cellspacing=\"0\" border=\"1\" style=\"border-collapse:collapse; width:100%;\"><thead><tr><th align=\"left\">Id</th><th align=\"left\" style=\"width:35%;\">Name</th><th align=\"left\">Start</th><th align=\"left\">End</th><th align=\"left\">Status</th><th align=\"left\">Managers</th></tr></thead><tbody>{{#each tasks.list}}<tr><td>{{ Id }}</td><td>{{ DoubleQuotesReplace Name }}</td><td>{{ date StartDate \"yyyy-MM-dd\" }}</td><td>{{ date EndDate \"yyyy-MM-dd\" }}</td><td>{{ Status.Name }}</td><td>{{#each ProjectDetails.Managers}}{{ DisplayName }}{{#unless @last}}, {{/unless}}{{/each}}</td></tr>{{/each}}</tbody></table>{{/ifempty}}<p style=\"margin-top:12px; font-size:12px; color:#666;\">Sent by ITM Platform extension.</p></body></html>"
+				}
+			]
+		}
+	],
+	"config": [
+		{
+			"name": "isactive",
+			"label": {
+				"en": "Activate extension",
+				"es": "Activar extensión",
+				"pt": "Ativar extensão"
+			},
+			"type": "checkbox"
+		},
+		{
+			"name": "synchronizationfrequency",
+			"label": {
+				"en": "Synchronization frequency (minutes)",
+				"es": "Frecuencia de sincronización (minutos)",
+				"pt": "Frequência de sincronização (minutos)"
+			},
+			"tooltip": {
+				"en": "Minimum 60. Typical: 1440 for daily.",
+				"es": "Mínimo 60. Típico: 1440 diario.",
+				"pt": "Mínimo 60. Típico: 1440 diário."
+			},
+			"type": "string",
+			"required": true
+		},
+		{
+			"name": "apikey",
+			"label": {
+				"en": "API Key",
+				"es": "API Key",
+				"pt": "API Key"
+			},
+			"tooltip": {
+				"en": "API Key for the ITM user that will authenticate.",
+				"es": "API Key del usuario ITM que autenticará.",
+				"pt": "API Key do usuário ITM que autenticará."
+			},
+			"type": "string",
+			"required": true
+		},
+		{
+			"name": "recipientEmail",
+			"label": {
+				"en": "Recipient email",
+				"es": "Email del destinatario",
+				"pt": "Email do destinatário"
+			},
+			"tooltip": {
+				"en": "Fixed address that will receive the report.",
+				"es": "Dirección fija que recibirá el informe.",
+				"pt": "Endereço fixo que receberá o relatório."
+			},
+			"type": "string",
+			"required": true
+		}
+	]
+}

@@ -216,11 +216,16 @@ To render the list in the email body, we decided to use the handy `#each` operat
 
 As we know, the `tasks` object has a `list` property that will hold all tasks and columns as we requested them.
 
-## Bonus example
 
-In this same folder, you have access to `e3.1-overdue-task-email.json`, an example that uses a loop to send an email task by task.
+## Additional examples
 
-The only difference will be that you will send one email per task, like so:
+### e3.1 — One email *per task* to the project manager
+
+**File:** [e3.1-overdue-task-email.json](./e3.1-overdue-task-email.json)
+
+* **Scope:** single project (`config.projectId`). Uses `POST /v2/{company}/Projects/{projectId}/Tasks/search`.
+* **Flow:** login → get project (to read managers) → search overdue tasks → `loop` that sends **one email per task** to the first project manager.
+* **Email style:** short, task-focused message (name, due date, status); templating is inside the loop so each iteration sends a separate email.
 
 ```json
     {
@@ -240,6 +245,50 @@ The only difference will be that you will send one email per task, like so:
         ]
     }
 ```
+### e3.2 — One consolidated email to a fixed recipient (*all projects*)
+
+**File:** [e3-all-overdue-tasks-scheduled-email-report.json](./e3-all-overdue-tasks-scheduled-email-report.json)
+
+* **Scope:** **entire account**; uses `POST /v2/{company}/Tasks/Search`, which returns tasks **across all projects** (no `projectId`).
+* **Flow:** login → global overdue-tasks search (`EndDate ≤ today`, exclude closed) → **one email** to `config.recipientEmail` with a formatted HTML table. 
+
+
+
+#### Handlebars usage and email formatting (how it’s done)
+
+**Where templating is used**
+
+* In the **email subject** and **email body** strings.
+* In the JSON **payload** of the search call (for dynamic date strings like `{{ DateTime.Now "yyyy-MM-dd" }}`).
+
+**Key helpers and patterns** (as used in e3.2)
+
+* **Date injection in payload:**
+  `\"EndDate\": { \"$lte\": \"{{ DateTime.Now \"yyyy-MM-dd\" }}\" }`
+  → Builds the API filter with today’s date before the request is sent. 
+* **Empty state:**
+  `{{#ifempty tasks.list}} No overdue tasks ... {{else}} ... {{/ifempty}}`
+  → Shows a clear message when there are no results. 
+* **Row iteration:**
+  `{{#each tasks.list}} ... {{/each}}`
+  → Generates one `<tr>` per task using fields like `{{ Id }}`, `{{ Status.Name }}`, etc. 
+* **Date formatting in table:**
+  `{{ date EndDate "yyyy-MM-dd" }}` and `{{ date StartDate "yyyy-MM-dd" }}`. 
+* **Escaping double quotes in names:**
+  `{{ DoubleQuotesReplace Name }}` to avoid breaking HTML/attributes when a task name includes `"` characters. 
+* **Comma-separated managers:**
+
+  ```handlebars
+  {{#each ProjectDetails.Managers}}
+    {{ DisplayName }}{{#unless @last}}, {{/unless}}
+  {{/each}}
+  ```
+
+  → Prints a clean list without a trailing comma. 
+* **Subject composition:**
+  `"Overdue tasks — {{ DateTime.Now "yyyy-MM-dd" }} ({{ tasks.total }} total; showing up to {{ tasks.pageSize }})"`
+  → Injects today’s date and counts from the API response. 
+
 
 <a href="../example-4/">Continue to example 4</a>
 
