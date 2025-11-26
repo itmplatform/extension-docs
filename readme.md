@@ -74,6 +74,9 @@ All these examples include the code and a tutorial. It is recommended to start w
     - Connector to a third-party system
 - [Example 5](https://github.com/itmplatform/extension-docs/tree/main/example-5). Allow users to input revenue's Actual Amount if <= Projected Amount. 
     - Event-based, synchronous
+- [Example 6](https://github.com/itmplatform/extension-docs/tree/main/example-6). Generate a project summary using LLM and send it via email weekly.
+    - Scheduler-based
+    - Uses `llm` action
 
 You can also look at the code of the [public extensions](./public/) such as the [Help Scout connector](./public/helpscout/) or the [Zendesk connector](./public/zendesk/) which include both source code and comprehensive developer guides.
 
@@ -383,6 +386,32 @@ Sends an email to the specified recipient(s). The sender will be notifier@itmpla
 - `subject`: Contains the subject text. It allows templates.
 - `body`: contains the message body. It allows templates.
 
+
+#### "action": "llm"
+
+Generates content using a Large Language Model (LLM).
+
+<i class="far fa-code" title="Learn by example"></i> **Learn by example**
+
+```json
+{
+    "action": "llm",
+    "description": "Generate Project Summary",
+    "input": "Summarize the project described in the provided JSON using PMI-style terminology and structure. {{json project}}.",
+    "output": "ai_response"
+}
+```
+
+<i class="fad fa-book-open" title="Guide"></i> **Guide**
+
+The `llm` action sends a prompt to an AI model and stores the generated response in the `output` variable. You can use templates in the `input` field to include dynamic data from previous actions.
+
+<i class="fad fa-brackets" title="Reference"></i> **Reference**
+
+- `action`: Must be `llm`
+- `input`: The prompt to be sent to the LLM.
+- `output`: <a href="#output-object">output object</a> that will contain the AI's response.
+- `description`: Reference for the developer.
 
 #### "action": "loop"
 

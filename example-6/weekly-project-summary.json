@@ -1,0 +1,134 @@
+{
+    "name": "weekly-project-summary",
+    "svgString": "<svg xmlns='http://www.w3.org/2000/svg' fill='#495d73' viewBox='0 0 640 512'><path d='M64 112c-8.8 0-16 7.2-16 16v22.1L220.5 291.7c20.7 17 50.4 17 71.1 0L464 150.1V128c0-8.8-7.2-16-16-16H64zM48 212.2V384c0 8.8 7.2 16 16 16H448c8.8 0 16-7.2 16-16V212.2L322 328.8c-38.4 31.5-93.7 31.5-132 0L48 212.2zM0 128C0 92.7 28.7 64 64 64H448c35.3 0 64 28.7 64 64V384c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128z'/></svg>",
+    "details": {
+        "title": {
+            "en": "Weekly Project Summary",
+            "es": "Resumen Semanal de Proyectos",
+            "pt": "Resumo Semanal de Projetos"
+        },
+        "version": "1.0.0",
+        "shortDescription": {
+            "en": "Sends a weekly AI-generated summary of active projects.",
+            "es": "Envía un resumen semanal generado por IA de los proyectos activos.",
+            "pt": "Envia um resumo semanal gerado por IA dos projetos ativos."
+        },
+        "longDescription": {
+            "en": "This extension runs weekly, retrieves active projects, generates a summary using an LLM, and emails the summary.",
+            "es": "Esta extensión se ejecuta semanalmente, recupera proyectos activos, genera un resumen utilizando un LLM y envía el resumen por correo electrónico.",
+            "pt": "Esta extensão é executada semanalmente, recupera projetos ativos, gera um resumo usando um LLM e envia o resumo por e-mail."
+        },
+        "updated": "2025-11-26",
+        "developer": "ITM Platform"
+    },
+    "features": [
+        {
+            "trigger": "scheduler",
+            "description": "Weekly AI Project Summary",
+            "actions": [
+                {
+                    "action": "restcall",
+                    "url": "@@ITMAPI@@/@@AccountName@@/login/{{ config.apikey }}",
+                    "method": "POST",
+                    "description": "Login",
+                    "output": "loginInfo",
+                    "dataType": "application/json"
+                },
+                {
+                    "action": "restcall",
+                    "url": "@@ITMAPI@@/v2/@@AccountName@@/projects/Search",
+                    "method": "POST",
+                    "token": "{{ loginInfo.Token }}",
+                    "description": "Search Active Projects",
+                    "output": "projectData",
+                    "dataType": "application/json",
+                    "payload": "{\"Columns\": {\"$in\": [\"Id\", \"Name\", \"Description\", \"InternalCode\", \"Code\", \"InternalCostCenter\", \"StartDate\", \"EndDate\", \"Duration\", \"CreatedDate\", \"MethodTypeId\", \"Status\", \"Priority\", \"ApprovalStatus\", \"PerformingUnit\", \"BusinessGoal\", \"Category\", \"ProcessAffected\", \"Sponsor\", \"InternalClient\", \"ExternalClient\", \"Asset\", \"Managers\", \"TeamMembers\", \"Guests\", \"Creator\", \"ProgressComplete\", \"Assessment\", \"Expected\", \"Deviation\", \"CompletedCalculated\", \"ExpectedROI\", \"TopDown\", \"PEC\", \"Actual\", \"BottomUp\", \"ActiveBaseline\", \"DifferenceTopDownAndBottomUpCostBudget\", \"TotalEstimatedEffort\", \"HasPurchases\", \"HasRevenues\", \"HasRisks\", \"HasIssues\", \"HasDocuments\", \"Sponsor.Name\", \"InternalClient.Name\", \"ExternalClient.Name\", \"ProcessAffected.Path\", \"Asset.Name\", \"Program.Name\", \"BaselineExpected\"]}, \"filter\": {\"IsActive\": true}}"
+                },
+                {
+                    "action": "loop",
+                    "loop": {
+                        "var": "projectData.list",
+                        "output": "project",
+                        "index": "index"
+                    },
+                    "actions": [
+                        {
+                            "action": "llm",
+                            "description": "Generate Project Summary",
+                            "input": "Summarize the project described in the provided JSON using PMI-style terminology and structure. {{json project}}. I want to send it in an email so don't suggest anything.",
+                            "output": "ai_response"
+                        },
+                        {
+                            "action": "email",
+                            "to": "{{ config.email_address }}",
+                            "subject": "Weekly Summary: {{ project.Name }}",
+                            "body": "<html><body><h2>AI-Generated Project Summary</h2><p><strong>Project:</strong> {{ project.Name }}</p><hr><pre>{{ ai_response }}</pre></body></html>"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "config": [
+        {
+            "name": "isactive",
+            "label": {
+                "en": "Activate extension",
+                "es": "Activar extensión",
+                "pt": "Ativar extensão"
+            },
+            "tooltip": {
+                "en": "Enable/disable this extension",
+                "es": "Habilitar/deshabilitar esta extensión",
+                "pt": "Ativar/desativar esta extensão"
+            },
+            "type": "checkbox"
+        },
+        {
+            "name": "synchronizationfrequency",
+            "label": {
+                "en": "Synchronization frequency (minutes)",
+                "es": "Frecuencia de sincronización (minutos)",
+                "pt": "Frequência de sincronização (minutos)"
+            },
+            "tooltip": {
+                "en": "Minutes required for weekly execution (10080)",
+                "es": "Minutos requeridos para ejecución semanal (10080)",
+                "pt": "Minutos necessários para execução semanal (10080)"
+            },
+            "type": "string",
+            "required": true
+        },
+        {
+            "name": "apikey",
+            "label": {
+                "en": "API Key",
+                "es": "Clave API",
+                "pt": "Chave API"
+            },
+            "tooltip": {
+                "en": "Your ITM Platform API Key",
+                "es": "Tu Clave API de ITM Platform",
+                "pt": "Sua Chave API da ITM Platform"
+            },
+            "type": "string",
+            "required": true
+        },
+        {
+            "name": "email_address",
+            "label": {
+                "en": "Email Address",
+                "es": "Dirección de Correo",
+                "pt": "Endereço de E-mail"
+            },
+            "tooltip": {
+                "en": "Email to receive summaries",
+                "es": "Correo para recibir resúmenes",
+                "pt": "E-mail para receber resumos"
+            },
+            "type": "string",
+            "required": true
+        }
+    ]
+}
+
