@@ -4,19 +4,19 @@
     "details": {
         "title": {
             "en": "Weekly Project Summary",
-            "es": "Resumen Semanal de Proyectos",
-            "pt": "Resumo Semanal de Projetos"
+            "es": "Resumen Semanal de Proyecto",
+            "pt": "Resumo Semanal de Projeto"
         },
-        "version": "1.0.0",
+        "version": "1.1.0",
         "shortDescription": {
-            "en": "Sends a weekly AI-generated summary of active projects.",
-            "es": "Envía un resumen semanal generado por IA de los proyectos activos.",
-            "pt": "Envia um resumo semanal gerado por IA dos projetos ativos."
+            "en": "Sends a weekly AI-generated summary of a specific project.",
+            "es": "Envía un resumen semanal generado por IA de un proyecto específico.",
+            "pt": "Envia um resumo semanal gerado por IA de um projeto específico."
         },
         "longDescription": {
-            "en": "This extension runs weekly, retrieves active projects, generates a summary using an LLM, and emails the summary.",
-            "es": "Esta extensión se ejecuta semanalmente, recupera proyectos activos, genera un resumen utilizando un LLM y envía el resumen por correo electrónico.",
-            "pt": "Esta extensão é executada semanalmente, recupera projetos ativos, gera um resumo usando um LLM e envia o resumo por e-mail."
+            "en": "This extension runs weekly, retrieves data for a specific project ID, generates a summary using an LLM, and emails the summary.",
+            "es": "Esta extensión se ejecuta semanalmente, recupera datos de un ID de proyecto específico, genera un resumen utilizando un LLM y envía el resumen por correo electrónico.",
+            "pt": "Esta extensão é executada semanalmente, recupera dados de um ID de projeto específico, gera um resumo usando um LLM e envia o resumo por e-mail."
         },
         "updated": "2025-11-26",
         "developer": "ITM Platform"
@@ -39,32 +39,22 @@
                     "url": "@@ITMAPI@@/v2/@@AccountName@@/projects/Search",
                     "method": "POST",
                     "token": "{{ loginInfo.Token }}",
-                    "description": "Search Active Projects",
+                    "description": "Get Project Data",
                     "output": "projectData",
                     "dataType": "application/json",
-                    "payload": "{\"Columns\": {\"$in\": [\"Id\", \"Name\", \"Description\", \"InternalCode\", \"Code\", \"InternalCostCenter\", \"StartDate\", \"EndDate\", \"Duration\", \"CreatedDate\", \"MethodTypeId\", \"Status\", \"Priority\", \"ApprovalStatus\", \"PerformingUnit\", \"BusinessGoal\", \"Category\", \"ProcessAffected\", \"Sponsor\", \"InternalClient\", \"ExternalClient\", \"Asset\", \"Managers\", \"TeamMembers\", \"Guests\", \"Creator\", \"ProgressComplete\", \"Assessment\", \"Expected\", \"Deviation\", \"CompletedCalculated\", \"ExpectedROI\", \"TopDown\", \"PEC\", \"Actual\", \"BottomUp\", \"ActiveBaseline\", \"DifferenceTopDownAndBottomUpCostBudget\", \"TotalEstimatedEffort\", \"HasPurchases\", \"HasRevenues\", \"HasRisks\", \"HasIssues\", \"HasDocuments\", \"Sponsor.Name\", \"InternalClient.Name\", \"ExternalClient.Name\", \"ProcessAffected.Path\", \"Asset.Name\", \"Program.Name\", \"BaselineExpected\"]}, \"filter\": {\"IsActive\": true}}"
+                    "payload": "{\"Columns\": {\"$in\": [\"Id\", \"Name\", \"Description\", \"InternalCode\", \"Code\", \"InternalCostCenter\", \"StartDate\", \"EndDate\", \"Duration\", \"CreatedDate\", \"MethodTypeId\", \"Status\", \"Priority\", \"ApprovalStatus\", \"PerformingUnit\", \"BusinessGoal\", \"Category\", \"ProcessAffected\", \"Sponsor\", \"InternalClient\", \"ExternalClient\", \"Asset\", \"Managers\", \"TeamMembers\", \"Guests\", \"Creator\", \"ProgressComplete\", \"Assessment\", \"Expected\", \"Deviation\", \"CompletedCalculated\", \"ExpectedROI\", \"TopDown\", \"PEC\", \"Actual\", \"BottomUp\", \"ActiveBaseline\", \"DifferenceTopDownAndBottomUpCostBudget\", \"TotalEstimatedEffort\", \"HasPurchases\", \"HasRevenues\", \"HasRisks\", \"HasIssues\", \"HasDocuments\", \"Sponsor.Name\", \"InternalClient.Name\", \"ExternalClient.Name\", \"ProcessAffected.Path\", \"Asset.Name\", \"Program.Name\", \"BaselineExpected\"]}, \"filter\": {\"Id\": {{ int config.project_id }} }}"
                 },
                 {
-                    "action": "loop",
-                    "loop": {
-                        "var": "projectData.list",
-                        "output": "project",
-                        "index": "index"
-                    },
-                    "actions": [
-                        {
-                            "action": "llm",
-                            "description": "Generate Project Summary",
-                            "input": "Summarize the project described in the provided JSON using PMI-style terminology and structure. {{json project}}. I want to send it in an email so don't suggest anything.",
-                            "output": "ai_response"
-                        },
-                        {
-                            "action": "email",
-                            "to": "{{ config.email_address }}",
-                            "subject": "Weekly Summary: {{ project.Name }}",
-                            "body": "<html><body><h2>AI-Generated Project Summary</h2><p><strong>Project:</strong> {{ project.Name }}</p><hr><pre>{{ ai_response }}</pre></body></html>"
-                        }
-                    ]
+                    "action": "llm",
+                    "description": "Generate Project Summary",
+                    "input": "Summarize the project described in the provided JSON using PMI-style terminology and structure. {{json projectData.list.First}}. I want to send it in an email so don't suggest anything.",
+                    "output": "ai_response"
+                },
+                {
+                    "action": "email",
+                    "to": "{{ config.email_address }}",
+                    "subject": "Weekly Summary: {{ projectData.list.First.Name }}",
+                    "body": "<html><body><h2>AI-Generated Project Summary</h2><p><strong>Project:</strong> {{ projectData.list.First.Name }}</p><hr><pre>{{ ai_response }}</pre></body></html>"
                 }
             ]
         }
@@ -95,6 +85,21 @@
                 "en": "Minutes required for weekly execution (10080)",
                 "es": "Minutos requeridos para ejecución semanal (10080)",
                 "pt": "Minutos necessários para execução semanal (10080)"
+            },
+            "type": "string",
+            "required": true
+        },
+        {
+            "name": "project_id",
+            "label": {
+                "en": "Project ID",
+                "es": "ID del Proyecto",
+                "pt": "ID do Projeto"
+            },
+            "tooltip": {
+                "en": "The ID of the project to summarize",
+                "es": "El ID del proyecto a resumir",
+                "pt": "O ID do projeto para resumir"
             },
             "type": "string",
             "required": true
@@ -131,4 +136,3 @@
         }
     ]
 }
-

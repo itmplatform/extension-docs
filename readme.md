@@ -74,9 +74,9 @@ All these examples include the code and a tutorial. It is recommended to start w
     - Connector to a third-party system
 - [Example 5](https://github.com/itmplatform/extension-docs/tree/main/example-5). Allow users to input revenue's Actual Amount if <= Projected Amount. 
     - Event-based, synchronous
-- [Example 6](https://github.com/itmplatform/extension-docs/tree/main/example-6). Generate a project summary using LLM and send it via email weekly.
+- [Example 6](https://github.com/itmplatform/extension-docs/tree/main/example-6). Generate a weekly project summary for a specific project using LLM.
     - Scheduler-based
-    - Uses `llm` action
+    - Uses `llm` action to summarize single project data
 
 You can also look at the code of the [public extensions](./public/) such as the [Help Scout connector](./public/helpscout/) or the [Zendesk connector](./public/zendesk/) which include both source code and comprehensive developer guides.
 
@@ -397,7 +397,7 @@ Generates content using a Large Language Model (LLM).
 {
     "action": "llm",
     "description": "Generate Project Summary",
-    "input": "Summarize the project described in the provided JSON using PMI-style terminology and structure. {{json project}}.",
+    "input": "Make a summary of the project you are given. {{json projectData.list.First}}.",
     "output": "ai_response"
 }
 ```
