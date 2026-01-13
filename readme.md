@@ -74,9 +74,6 @@ All these examples include the code and a tutorial. It is recommended to start w
     - Connector to a third-party system
 - [Example 5](https://github.com/itmplatform/extension-docs/tree/main/example-5). Allow users to input revenue's Actual Amount if <= Projected Amount. 
     - Event-based, synchronous
-- [Example 6](https://github.com/itmplatform/extension-docs/tree/main/example-6). Generate a weekly project summary for a specific project using LLM.
-    - Scheduler-based
-    - Uses `llm` action to summarize single project data
 
 You can also look at the code of the [public extensions](./public/) such as the [Help Scout connector](./public/helpscout/) or the [Zendesk connector](./public/zendesk/) which include both source code and comprehensive developer guides.
 
@@ -386,32 +383,6 @@ Sends an email to the specified recipient(s). The sender will be notifier@itmpla
 - `subject`: Contains the subject text. It allows templates.
 - `body`: contains the message body. It allows templates.
 
-
-#### "action": "llm"
-
-Generates content using a Large Language Model (LLM).
-
-<i class="far fa-code" title="Learn by example"></i> **Learn by example**
-
-```json
-{
-    "action": "llm",
-    "description": "Generate Project Summary",
-    "input": "Make a summary of the project you are given. {{json projectData.list.First}}.",
-    "output": "ai_response"
-}
-```
-
-<i class="fad fa-book-open" title="Guide"></i> **Guide**
-
-The `llm` action sends a prompt to an AI model and stores the generated response in the `output` variable. You can use templates in the `input` field to include dynamic data from previous actions.
-
-<i class="fad fa-brackets" title="Reference"></i> **Reference**
-
-- `action`: Must be `llm`
-- `input`: The prompt to be sent to the LLM.
-- `output`: <a href="#output-object">output object</a> that will contain the AI's response.
-- `description`: Reference for the developer.
 
 #### "action": "loop"
 
@@ -849,14 +820,30 @@ The following are the events that ITM Platform triggers.
 |scheduler|||This executes from scheduler|context.LastExecution|
 |event|Task|inserted|When a task is inserted| ``` { "accountId": "accountId", "projectId": "projectId", "userId": "userId", "task": { "Id": "taskId", "Name": "taskName", "JiraTaskId": "JiraTaskId", "KindId": "taskKindId" } } ```|
 |event|Task|updated|When a task is updated|``` { "accountId": "accountId", "projectId": "projectId", "userId": "userId", "task": { "Id": "taskId", "Name": "taskName", "JiraTaskId": "JiraTaskId", "KindId": "taskKindId" }}``` |
+|event|Task|deleted|When a task is deleted|``` { "accountId": "accountId", "projectId": "projectId", "userId": "userId", "task": { "Id": "taskId", "Name": "taskName", "KindId": "taskKindId" }}``` |
 |event|Project|inserted|When a project is created| ``` { "accountId": "accountId", "userId": "userId", "project": { "Id": "projectId", "Name": "projectName", "TypeId": "typeId", "Description": "description" }}```|
 |event|Project|updated|When a project is updated| ``` { "accountId": "accountId", "userId": "userId", "project": { "Id": "projectId", "Name": "projectName", "TypeId": "typeId", "Description": "description" }} ```|
+|event|Project|deleted|When a project is deleted| ``` { "accountId": "accountId", "userId": "userId", "project": { "Id": "projectId", "Name": "projectName", "TypeId": "typeId", "Description": "description" }} ```|
 |event|Purchase|inserted|When a Purchase is created| ``` { "accountId": "accountId", "projectId": "projectId", "userId": "userId", "purchase": { "Id": purchaseId, "Name": "purchaseName", "ActualAmount": "actualAmount", "ProjectedAmount": "projectedAmount", "StatusId": "statusId" } }```|
 |event|Purchase|updated|When a Purchase is updated| ``` { "accountId": "accountId", "projectId": "projectId", "userId": "userId", "purchase": { "Id": purchaseId, "Name": "purchaseName", "ActualAmount": "actualAmount", "ProjectedAmount": projectedAmount", "StatusId": "statusId" } }```|
+|event|Purchase|deleted|When a Purchase is deleted| ``` { "accountId": "accountId", "projectId": "projectId", "userId": "userId", "purchase": { "Id": purchaseId, "Name": "purchaseName", "ActualAmount": "actualAmount", "ProjectedAmount": projectedAmount", "StatusId": "statusId" } }```|
 |event|Revenue|pre insert|When a Revenue is going to be created| ``` { "ProjectedAmount": "projectedAmount", "ActualAmount": "actualAmount", "ProjectId": "projectId" } ```|
 |event|Revenue|inserted|When a Revenue is created| ``` { "Id": "revenueId", "Name": "revenueName", "DueDate": "dueDate", "ProjectedAmount": "projectedAmount", "ActualAmount": "actualAmount", "Status": "statusId", "ProjectId": "projectId" , "UserId": "UserId", "AccountId": "AccountId" } ```|
 |event|Revenue|pre update|When a Revenue is going to be updated| ``` { "ProjectedAmount": "projectedAmount", "ActualAmount": "actualAmount", "ProjectId": "projectId" } ```|
 |event|Revenue|updated|When a Revenue is updated| ``` { "Id": "revenueId", "Name": "revenueName", "DueDate": "dueDate", "ProjectedAmount": "projectedAmount", "ActualAmount": "actualAmount", "Status": "statusId", "ProjectId": "projectId" , "UserId": "UserId", "AccountId": "AccountId" } ```|
+|event|Revenue|deleted|When a Revenue is deleted| ``` { "Id": "revenueId", "Name": "revenueName", "DueDate": "dueDate", "ProjectedAmount": "projectedAmount", "ActualAmount": "actualAmount", "Status": "statusId", "ProjectId": "projectId" , "UserId": "UserId", "AccountId": "AccountId" } ```|
+|event|Risk|inserted|When a Risk is created| ``` { "accountId": "accountId", "userId": "userId", "projectId": "projectId", "risk": { "Id": riskId, "Name": "riskName", "TypeId": "typeId", "StatusId": "statusId", "ImpactId":"impactId", "ProbabilityId":"probabilityId", "LevelId":"levelId" } } ```|
+|event|Risk|updated|When a Risk is updated| ``` { "accountId": "accountId", "userId": "userId", "projectId": "projectId", "risk": { "Id": riskId, "Name": "riskName", "TypeId": "typeId", "StatusId": "statusId", "ImpactId":"impactId", "ProbabilityId":"probabilityId", "LevelId":"levelId" } }```|
+|event|Risk|deleted|When a Risk is deleted| ``` { "accountId": "accountId", "userId": "userId", "projectId": "projectId", "risk": { "Id": riskId, "Name": "riskName", "TypeId": "typeId" } }```|
+|event|Issue|inserted|When a Issue is created| ``` { "accountId": "accountId", "userId": "userId", "projectId": "projectId", "issue": { "Id": issueId, "Name": "issueName", "TypeId": "typeId", "Description": "description" } } ```|
+|event|Issue|updated|When a Issue is updated| ``` { "accountId": "accountId", "userId": "userId", "projectId": "projectId", "issue": { "Id": issueId, "Name": "issueName", "TypeId": "typeId", "Description": "description" } }```|
+|event|Issue|deleted|When a Issue is deleted| ``` { "accountId": "accountId", "userId": "userId", "projectId": "projectId", "issue": { "Id": issueId, "Name": "issueName", "TypeId": "typeId", "Description": "description" } }```|
+|event|Service|inserted|When a Service is inserted| ``` { "accountId": "accountId", "serviceId": "serviceId", "userId": "userId", "service": { "Id": "serviceId", "Name": "serviceName", "typeId": "serviceTypeId", "description" :"serviceDescription" } } ```|
+|event|Service|updated|When a Service is updated|``` { "accountId": "accountId", "serviceId": "serviceId", "userId": "userId", "service": { "Id": "serviceId", "Name": "serviceName", "typeId": "serviceTypeId", "description" :"serviceDescription" } }``` |
+|event|Service|deleted|When a Service is deleted|``` { "accountId": "accountId", "serviceId": "serviceId", "userId": "userId", "service": { "Id": "serviceId", "Name": "serviceName", "typeId": "serviceTypeId", "description" :"serviceDescription" } }``` |
+|event|Activity|inserted|When a Activity is inserted| ``` { "accountId": "accountId", "serviceId": "serviceId", "userId": "userId", "activity": { "Id": "activityId", "Name": "activityName", "typeId": "activityTypeId", "description" :"activityDescription" } } ```|
+|event|Activity|updated|When a Activity is updated|``` { "accountId": "accountId", "serviceId": "serviceId", "userId": "userId", "activity": { "Id": "activityId", "Name": "activityName", "typeId": "activityTypeId","description" :"activityDescription"  }}``` |
+|event|Activity|deleted|When a Activity is deleted|``` { "accountId": "accountId", "serviceId": "serviceId", "userId": "userId", "activity": { "Id": "activityId" }}``` |
 
 
 ## Event bubbling up
