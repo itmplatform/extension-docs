@@ -1030,10 +1030,9 @@ To create and deploy a script, you must have the proper license and permissions 
 {"actions":[{
     "action": "restcall",
     "url": "https://api.itmplatform.com/myCompany/login/{{ config.apikey }}",
-    "method": "POST",
+    "method": "GET",
     "description": "Login with apikey",
     "output": "logininfo",
-    "payload": "",
     "dataType": "application/json"
 },
 {

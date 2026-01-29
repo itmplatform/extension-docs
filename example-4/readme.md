@@ -33,10 +33,9 @@ We also have covered before the need to [authenticate](https://github.com/itmpla
 {
     "action": "restcall",
     "url": "@@ITMAPI@@/@@AccountName@@/login/{{ config.apikey }}",
-    "method": "POST",
+    "method": "GET",
     "description": "Login with apikey",
     "output": "loginInfo",
-    "payload": "",
     "dataType": "application/json"
 },
 ```

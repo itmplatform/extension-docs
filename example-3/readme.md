@@ -109,10 +109,9 @@ Next, we know we need to query ITM Platform. Because this feature is not based o
 {
     "action": "restcall",
     "url": "@@ITMAPI@@/@@AccountName@@/login/{{ config.apikey }}",
-    "method": "POST",
+    "method": "GET",
     "description": "Login with apikey",
     "output": "loginInfo",
-    "payload": "",
     "dataType": "application/json"
 },
 ```

@@ -22,10 +22,9 @@
                 {
                     "action": "restcall",
                     "url": "@@ITMAPI@@/@@AccountName@@/login/{{ config.apikey }}",
-                    "method": "POST",
+                    "method": "GET",
                     "description": "Login with API Key",
                     "output": "loginInfo",
-                    "payload": "",
                     "dataType": "application/json"
                 },
                 {

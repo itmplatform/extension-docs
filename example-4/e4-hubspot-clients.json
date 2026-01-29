@@ -33,7 +33,6 @@
 					"method": "GET",
 					"description": "Login with API Key",
 					"output": "loginInfo",
-					"payload": "",
 					"dataType": "application/json"
 				},
 				{
