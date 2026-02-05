@@ -145,11 +145,13 @@ When a feature is triggered by an event, such as a task update, you must specify
 
 When the feature is triggered by the scheduler, you must create the [synchronization frequency](#synchronization-frequency-"name"-"synchronizationfrequency") configuration option, so the user can set the value.
 
+When the feature is triggered by the install or uninstall, it will follow the actions as usual, when the extension is activated or deactivated respectively.
+
 <i class="fad fa-brackets" title="Reference"></i> **Reference**
 
 (*) Denotes a mandatory field
 
-- `trigger`: It can be `event`, `scheduler`, or `webhook` *
+- `trigger`: It can be `event`, `scheduler`, `install`, `uninstall`, or `webhook` *
 - `entity`: [Entities](#terminology) * mandatory for the `event` trigger
 - `event` [System Events](#Events) * mandatory for the `event` trigger
 - `async`: `true` or `false` It applies to the `event` trigger and determines whether the execution in ITM Platform that triggered it will stop (`false`) or the extension will run in a parallel thread (`true`). The default value is `async`: `true` if not specified.
@@ -161,7 +163,7 @@ When the feature is triggered by the scheduler, you must create the [synchroniza
  ### Checkpoints
 
  - Each extension should contain at least one feature.
- - Triggers must be either `scheduler` or `event`
+ - Triggers must be either `scheduler`, `event`, `install` or `uninstall`
  - Each feature will have actions array.
 
 ## Features and actions 
