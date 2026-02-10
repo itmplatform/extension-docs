@@ -145,7 +145,7 @@ When a feature is triggered by an event, such as a task update, you must specify
 
 When the feature is triggered by the scheduler, you must create the [synchronization frequency](#synchronization-frequency-"name"-"synchronizationfrequency") configuration option, so the user can set the value.
 
-When the feature is triggered by the install or uninstall, it will follow the actions as usual, when the extension is activated or deactivated respectively.
+When the feature is triggered by the [install or uninstall](#install--uninstall-triggers), the actions will execute when the extension is activated or deactivated respectively.
 
 <i class="fad fa-brackets" title="Reference"></i> **Reference**
 
@@ -163,7 +163,7 @@ When the feature is triggered by the install or uninstall, it will follow the ac
  ### Checkpoints
 
  - Each extension should contain at least one feature.
- - Triggers must be either `scheduler`, `event`, `install` or `uninstall`
+ - Triggers must be either `scheduler`, `event`, `install`, `uninstall` or `webhook`
  - Each feature will have actions array.
 
 ## Features and actions 
@@ -604,7 +604,72 @@ If you need to send the whole `input` object as JSON in a `restcall` (or any act
 With this one‑liner the complete webhook payload is forwarded exactly as ITM Platform received it, making debugging much easier.
 
 
-## Extension Configuration 
+### Install & Uninstall Triggers
+
+The `install` and `uninstall` triggers execute actions when an extension is **activated** or **deactivated** respectively. They are useful for setup and cleanup tasks such as registering webhooks in external systems, sending notifications, or revoking credentials.
+
+<i class="far fa-code" title="Learn by example"></i> **Learn by example**
+
+```json
+{
+    "features": [
+        {
+            "trigger": "install",
+            "description": "Register webhook on activation",
+            "actions": [
+                {
+                    "action": "restcall",
+                    "url": "https://api.external-system.com/webhooks",
+                    "method": "POST",
+                    "payload": "{\"url\": \"@@ITMAPI@@/@@AccountName@@/webhooks/my-extension\", \"events\": [\"updated\"]}",
+                    "dataType": "application/json",
+                    "output": "webhookResult"
+                },
+                {
+                    "action": "email",
+                    "to": "admin@yourcompany.com",
+                    "subject": "Extension activated",
+                    "body": "<html><p>The extension has been activated and the webhook registered.</p></html>"
+                }
+            ]
+        },
+        {
+            "trigger": "uninstall",
+            "description": "Clean up on deactivation",
+            "actions": [
+                {
+                    "action": "restcall",
+                    "url": "https://api.external-system.com/webhooks/{{ config.webhookId }}",
+                    "method": "DELETE",
+                    "description": "Remove webhook from external system"
+                }
+            ]
+        }
+    ]
+}
+```
+
+<i class="fad fa-book-open" title="Guide"></i> **Guide**
+
+Both triggers follow the standard feature structure and support the same action types as any other feature. The `install` trigger runs once when the extension is activated; the `uninstall` trigger runs once when it is deactivated.
+
+Typical use cases:
+- **Install**: Register webhooks in third-party systems, perform an initial data synchronization, send setup notifications.
+- **Uninstall**: Remove webhooks, revoke API tokens, clean up external resources.
+
+<i class="fad fa-brackets" title="Reference"></i> **Reference**
+
+Input data available during execution:
+
+| Field | Description |
+|-------|-------------|
+| `input.AccountId` | ITM Platform account ID |
+| `input.Connector` | Extension name |
+| `input.UserEmail` | Email of the user who triggered the activation/deactivation |
+| `input.UserId` | ID of the user who triggered the activation/deactivation |
+
+
+## Extension Configuration
 
 The `"config"` array will determine the content rendered in the extension's configuration tab on ITM Platform, displaying all fields required for your extension to operate.
 
