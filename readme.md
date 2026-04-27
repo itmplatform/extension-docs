@@ -916,7 +916,7 @@ The following are the events that ITM Platform triggers.
 |---|---|---|---|---|
 |scheduler|||This executes from scheduler|context.LastExecution|
 |event|Task|inserted|When a task is inserted| ``` { "accountId": "accountId", "projectId": "projectId", "userId": "userId", "task": { "Id": "taskId", "Name": "taskName", "JiraTaskId": "JiraTaskId", "KindId": "taskKindId" } } ```|
-|event|Task|updated|When a task is updated|``` { "accountId": "accountId", "projectId": "projectId", "userId": "userId", "task": { "Id": "taskId", "Name": "taskName", "JiraTaskId": "JiraTaskId", "KindId": "taskKindId" }}``` |
+|event|Task|updated|When a task is updated|``` { "accountId": "accountId", "projectId": "projectId", "userId": "userId", "task": { "Id": "taskId", "Name": "taskName", "JiraTaskId": "JiraTaskId", "KindId": "taskKindId" }, "diff": { "StatusName": { "old": "oldStatusName", "new": "newStatusName" }, "StatusId": { "old": "oldStatusId", "new": "newStatusId" } }, "HasChanges": true }``` |
 |event|Task|deleted|When a task is deleted|``` { "accountId": "accountId", "projectId": "projectId", "userId": "userId", "task": { "Id": "taskId", "Name": "taskName", "KindId": "taskKindId" }}``` |
 |event|Project|inserted|When a project is created| ``` { "accountId": "accountId", "userId": "userId", "project": { "Id": "projectId", "Name": "projectName", "TypeId": "typeId", "Description": "description" }}```|
 |event|Project|updated|When a project is updated| ``` { "accountId": "accountId", "userId": "userId", "project": { "Id": "projectId", "Name": "projectName", "TypeId": "typeId", "Description": "description" }} ```|
@@ -941,6 +941,63 @@ The following are the events that ITM Platform triggers.
 |event|Activity|inserted|When a Activity is inserted| ``` { "accountId": "accountId", "serviceId": "serviceId", "userId": "userId", "activity": { "Id": "activityId", "Name": "activityName", "typeId": "activityTypeId", "description" :"activityDescription" } } ```|
 |event|Activity|updated|When a Activity is updated|``` { "accountId": "accountId", "serviceId": "serviceId", "userId": "userId", "activity": { "Id": "activityId", "Name": "activityName", "typeId": "activityTypeId","description" :"activityDescription"  }}``` |
 |event|Activity|deleted|When a Activity is deleted|``` { "accountId": "accountId", "serviceId": "serviceId", "userId": "userId", "activity": { "Id": "activityId" }}``` |
+
+
+## Extended event payload: `diff` and `HasChanges`
+
+In addition to the base entity data, `updated` events for **Task** include extra fields that describe what changed. These fields allow extensions to react only to specific changes, often without additional API calls. Note that calculated or catalog-backed fields (such as `IsCompleted`) should still be verified via a REST call, since `diff` only carries the raw values at the time of the update.
+
+### `diff`
+
+Contains only the fields that changed, with their old and new values. For example, when a task status changes:
+
+```json
+{
+  "diff": {
+    "StatusName": { "old": "To Do", "new": "Completed" },
+    "StatusId": { "old": 544585, "new": 544588 }
+  }
+}
+```
+
+The `diff` object will only contain entries for fields that actually changed. If a task name was updated but the status remained the same, `diff` would contain `Name` entries but no `StatusName` or `StatusId`.
+
+> **Important:** Since `diff` only contains changed fields, always check for `null` before accessing nested properties. If the status did not change, `input.diff.StatusId` will be `null` and accessing `.old` on it will cause an error.
+
+Access in templates: `{{ input.diff.StatusId.old }}`, `{{ input.diff.StatusName.new }}`
+
+### `HasChanges`
+
+A boolean (`true`/`false`) indicating whether the update produced changes to any tracked property of the entity (such as dates, cost, or status). Useful for early-exit conditions.
+
+Access in templates: `{{ input.HasChanges }}`
+
+### Using `diff` in conditions
+
+You can use `diff` to filter events at the feature condition level or at the action condition level. Since `diff` only contains changed fields, you must null-check before accessing nested properties. If a condition throws an error, the action handler catches it and **defaults to executing the event**, which could cause unintended behavior.
+
+For example, to only execute actions when the status changed:
+
+```json
+{
+    "trigger": "event",
+    "entity": "Task",
+    "event": "updated",
+    "condition": "input.diff != null && input.diff.StatusId != null && Convert.ToInt32(input.diff.StatusId.old) != Convert.ToInt32(input.diff.StatusId.new)",
+    "async": true,
+    "actions": [...]
+}
+```
+
+Or to react only when the status changes to a specific value:
+
+```json
+{
+    "condition": "input.diff != null && input.diff.StatusName != null && Convert.ToString(input.diff.StatusName.new) == \"Completed\""
+}
+```
+
+> **Note:** The `diff` and `HasChanges` fields are generated server-side and are read-only.
 
 
 ## Event bubbling up
