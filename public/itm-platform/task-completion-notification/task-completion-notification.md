@@ -76,7 +76,7 @@ This section explains how the extension script works internally.
     "trigger": "event",
     "entity": "Task",
     "event": "updated",
-    "condition": "input.diff != null && input.diff.StatusId != null && input.diff.StatusId.old.ToString() != input.diff.StatusId.new.ToString()",
+    "condition": "input.diff != null && input.diff.StatusId != null",
     "async": true
 }
 ```
@@ -84,7 +84,7 @@ This section explains how the extension script works internally.
 - **trigger**: `"event"` -- runs whenever a task event occurs in ITM Platform.
 - **entity**: `"Task"` -- listens to task-related events.
 - **event**: `"updated"` -- fires when a task is updated.
-- **condition**: Uses the `diff` object from the event payload to check that the `StatusId` actually changed. This avoids processing task updates that don't involve a status change (e.g., name edits, date changes). The condition is null-safe. Uses `ToString()` for comparison because the diff values are JToken objects, and `Convert.ToInt32()` does not work reliably with JToken in Dynamic LINQ expressions.
+- **condition**: Checks that the `diff` object contains a `StatusId` change. The `diff.StatusId` property is only present when the status actually changed (constructed conditionally in `TaskManager.cs`), so its mere existence is sufficient to gate this trigger. The downstream action (step 2) verifies whether the new status is a "completed" status via the REST API. This avoids processing task updates that don't involve a status change (e.g., name edits, date changes).
 - **async**: `true` -- runs without blocking the ITM Platform UI.
 
 ### Actions

@@ -26,7 +26,7 @@
             "trigger": "event",
             "entity": "Task",
             "event": "updated",
-            "condition": "input.diff != null && input.diff.StatusId != null && input.diff.StatusId.old.ToString() != input.diff.StatusId.new.ToString()",
+            "condition": "input.diff != null && input.diff.StatusId != null",
             "async": true,
             "description": "When a task status changes, check if completed and notify successor task team",
             "actions": [
