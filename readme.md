@@ -145,13 +145,13 @@ When a feature is triggered by an event, such as a task update, you must specify
 
 When the feature is triggered by the scheduler, you must create the [synchronization frequency](#synchronization-frequency-"name"-"synchronizationfrequency") configuration option, so the user can set the value.
 
-When the feature is triggered by the [onEnabled or onDisabled](#onEnabled--onDisabled-triggers), the actions will execute when the extension is activated or deactivated respectively.
+Lifecycle features can use [`onEnabled`, `onActivated`, or `onDisabled`](#lifecycle-triggers). `onEnabled` runs on every save while active, `onActivated` runs only on an inactive-to-active transition, and `onDisabled` runs when the extension is deactivated.
 
 <i class="fad fa-brackets" title="Reference"></i> **Reference**
 
 (*) Denotes a mandatory field
 
-- `trigger`: It can be `event`, `scheduler`, `onEnabled`, `onDisabled`, or `webhook` *
+- `trigger`: It can be `event`, `scheduler`, `onEnabled`, `onActivated`, `onDisabled`, or `webhook` *
 - `entity`: [Entities](#terminology) * mandatory for the `event` trigger
 - `event` [System Events](#Events) * mandatory for the `event` trigger
 - `async`: `true` or `false` It applies to the `event` trigger and determines whether the execution in ITM Platform that triggered it will stop (`false`) or the extension will run in a parallel thread (`true`). The default value is `async`: `true` if not specified.
@@ -163,7 +163,7 @@ When the feature is triggered by the [onEnabled or onDisabled](#onEnabled--onDis
  ### Checkpoints
 
  - Each extension should contain at least one feature.
- - Triggers must be either `scheduler`, `event`, `onEnabled`, `onDisabled` or `webhook`
+ - Triggers must be either `scheduler`, `event`, `onEnabled`, `onActivated`, `onDisabled` or `webhook`
  - Each feature will have actions array.
 
 ## Features and actions 
@@ -604,9 +604,11 @@ If you need to send the whole `input` object as JSON in a `restcall` (or any act
 With this one‑liner the complete webhook payload is forwarded exactly as ITM Platform received it, making debugging much easier.
 
 
-### onEnabled & onDisabled Triggers
+<a name="lifecycle-triggers"></a>
 
-The `onEnabled` and `onDisabled` triggers execute actions when an extension is **activated** or **deactivated** respectively. They are useful for setup and cleanup tasks such as registering webhooks in external systems, sending notifications, or revoking credentials.
+### Lifecycle Triggers
+
+Lifecycle triggers execute actions around extension activation and deactivation. `onEnabled` runs on every configuration save while the extension is active, `onActivated` runs only on an inactive-to-active transition, and `onDisabled` runs when the extension is deactivated.
 
 <i class="far fa-code" title="Learn by example"></i> **Learn by example**
 
@@ -615,7 +617,21 @@ The `onEnabled` and `onDisabled` triggers execute actions when an extension is *
     "features": [
         {
             "trigger": "onEnabled",
-            "description": "Register webhook on activation",
+            "description": "Reassert inexpensive, idempotent active state",
+            "actions": [
+                {
+                    "action": "restcall",
+                    "url": "https://api.external-system.com/integrations/my-extension",
+                    "method": "PUT",
+                    "payload": "{\"enabled\": true}",
+                    "dataType": "application/json",
+                    "output": "enabledResult"
+                }
+            ]
+        },
+        {
+            "trigger": "onActivated",
+            "description": "Perform one-time activation work",
             "actions": [
                 {
                     "action": "restcall",
@@ -623,13 +639,8 @@ The `onEnabled` and `onDisabled` triggers execute actions when an extension is *
                     "method": "POST",
                     "payload": "{\"url\": \"@@ITMAPI@@/@@AccountName@@/webhooks/my-extension\", \"events\": [\"updated\"]}",
                     "dataType": "application/json",
-                    "output": "webhookResult"
-                },
-                {
-                    "action": "email",
-                    "to": "admin@yourcompany.com",
-                    "subject": "Extension activated",
-                    "body": "<html><p>The extension has been activated and the webhook registered.</p></html>"
+                    "output": "webhookResult",
+                    "description": "Register the webhook once"
                 }
             ]
         },
@@ -651,10 +662,11 @@ The `onEnabled` and `onDisabled` triggers execute actions when an extension is *
 
 <i class="fad fa-book-open" title="Guide"></i> **Guide**
 
-Both triggers follow the standard feature structure and support the same action types as any other feature. The `onEnabled` trigger runs once when the extension is activated; the `onDisabled` trigger runs once when it is deactivated.
+All three triggers follow the standard feature structure and support the same action types as any other feature. Keep `onEnabled` actions inexpensive and idempotent because they run again whenever active configuration is saved. Put expensive one-time initialization in `onActivated`.
 
 Typical use cases:
-- **onEnabled**: Register webhooks in third-party systems, perform an initial data synchronization, send setup notifications.
+- **onEnabled**: Reassert inexpensive active state or refresh idempotent configuration.
+- **onActivated**: Register webhooks, perform an initial data synchronization, or send one-time setup notifications.
 - **onDisabled**: Remove webhooks, revoke API tokens, clean up external resources.
 
 <i class="fad fa-brackets" title="Reference"></i> **Reference**
