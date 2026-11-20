@@ -211,7 +211,7 @@ When saving an extension, the following validations will run. If the script does
 - If the action value is `restcall` or `soapcall`, there is an authentication attribute and its value is basic, it must have username and password. <!--explain this ?-->
 - If the action value is `validate`, it must have `validationCondition` and `message`.
 - If the action value is `map`, it must have `template`.
-- If the action value is `loop`, it must have `var`, `condition`, `actions` and `output`.
+- If the action value is `loop`, it must have `var`, `condition`, `actions` and `output`. It can also have `continueOnError` and `errorLabel` ([details](#loops-that-continue-after-a-failed-item)).
 
 
 ### Action Types
@@ -528,6 +528,54 @@ We can also loop with variables and conditions inside an action. For an example:
 <i class="fad fa-book-open" title="Guide"></i> **Guide**
 
 <i class="fad fa-brackets" title="Reference"></i> **Reference**
+
+##### Loops that continue after a failed item
+
+> **Availability:** not yet released to production. Until it is, ITM Platform ignores `continueOnError` and `errorLabel`, and the first failed item stops the run.
+
+By default, the first action that fails inside a loop stops the whole extension run. With `continueOnError`, the loop skips the failed item and goes on with the next one.
+
+<i class="far fa-code" title="Learn by example"></i> **Learn by example**
+
+```json
+{
+    "action": "loop",
+    "loop": {
+        "var": "jiraissues.issues",
+        "output": "issue",
+        "continueOnError": true,
+        "errorLabel": "Jira issue {{ issue.key }} ({{ issue.fields.summary }})"
+    },
+    "actions": [
+        {
+            "action": "restcall",
+            "url": "@@TaskMS@@/v2/@@AccountId@@/Projects/{{ itmproject.Id }}/Tasks?UserId=-99",
+            "method": "POST",
+            "payload": "{\"Name\": \"{{ issue.fields.summary }}\", \"EndDate\": \"{{ issue.fields.duedate }}\" }",
+            "dataType": "application/json"
+        }
+    ]
+}
+```
+
+If one issue has a due date that ITM Platform rejects, that task is not created, and the loop carries on with the remaining issues.
+
+<i class="fad fa-book-open" title="Guide"></i> **Guide**
+
+When an action fails for an item, the loop stops running that item's remaining actions. Actions that already ran for that item are not undone. An action fails when it raises an error, for example a `restcall` that receives a 400 or 500 response.
+
+Each skipped item adds a warning to the Script logs with the item's label and the error message. When the extension runs from the scheduler, the run counts as successful, and the Details column in the Event History reads "Last iteration succeeded with errors", followed by the number of skipped items and the first five of them. The next run starts at its usual time.
+
+A run with skipped items still updates `context.LastExecution`. If your script fetches only the records changed since the last run, a skipped record is processed again after it changes at the source, typically once the user corrects it.
+
+A failure inside a nested loop that does not set `continueOnError` reaches the outer loop, so the outer loop skips its whole current item.
+
+<i class="fad fa-brackets" title="Reference"></i> **Reference**
+
+| Property | Type | Default | Description |
+|---|---|---|---|
+| `continueOnError` | boolean | `false` | Skip an item whose actions fail and continue with the next item. |
+| `errorLabel` | string (template) | `Item <index> of <var>` | Identifies a skipped item in the logs and the Event History. It is rendered with the same variables as the loop's actions. Used only with `continueOnError`. |
 
 
 ### Action conditionals
